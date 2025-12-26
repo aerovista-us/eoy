@@ -2277,7 +2277,7 @@ Coherence by default - we committed to it`
           const letter = t.letter.toLowerCase();
           // For v2 files, replace _([number]) with ([number]) to match Full mode naming
           file = file.replace(/_(\(\d+\))/g, '$1');
-          file = letter + ")" + file;
+          file = letter + "_" + file;
         }
 
         // Update audio src (GitHub Pages may not handle encoded URLs properly)
@@ -2467,7 +2467,7 @@ Coherence by default - we committed to it`
           const alt = t.fileAlt ? t.fileAlt : "—";
           const letter = t.letter.toLowerCase();
           const fullV1 = letter + ")" + t.fileStd;
-          const fullV2 = alt === "—" ? "—" : letter + ")" + alt.replace(/_(\(\d+\))/g, '$1');
+          const fullV2 = alt === "—" ? "—" : letter + "_" + alt.replace(/_(\(\d+\))/g, '$1');
           return `${t.letter}) ${t.title}\n   v1: ${t.fileStd}\n   v2:  ${alt}\n   Full v1: ${fullV1}\n   Full v2:  ${fullV2}`;
         });
         const txt = `EchoStory — COHERENCE BY DEFAULT\n\n` + lines.join("\n\n");
