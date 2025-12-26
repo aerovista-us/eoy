@@ -31,7 +31,8 @@
   <link rel="apple-touch-icon" sizes="167x167" href="./icons/icon-167x167.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180x180.png" />
   
-  <!-- Apple Meta Tags -->
+  <!-- PWA Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="EchoStory" />
@@ -52,7 +53,7 @@
         radial-gradient(900px 700px at 90% 10%, rgba(39,224,255,.14), transparent 55%),
         radial-gradient(800px 650px at 30% 90%, rgba(44,255,143,.10), transparent 60%),
         linear-gradient(180deg, #070a0f, var(--bg));
-      background-image: 
+      background-image:
         url('./images/wallpaper_portrait.png');
       background-size: cover;
       background-position: center;
@@ -60,6 +61,9 @@
       background-blend-mode: overlay;
       min-height:100vh; overflow-x:hidden;
       position: relative;
+      /* Performance optimization */
+      will-change: auto;
+      contain: layout style paint;
     }
     body::before{
       content: "";
@@ -301,6 +305,26 @@
       flex:0 0 auto;
       border:1px solid var(--ev-stroke);
     }
+    .ev-album-cover{
+      position:relative; flex:0 0 auto;
+      width:120px; height:120px; border-radius:16px;
+      overflow:hidden; box-shadow: 0 10px 40px rgba(0,0,0,.45);
+      border:1px solid var(--ev-stroke);
+    }
+    .ev-cover-img{
+      width:100%; height:100%; object-fit:cover;
+      transition: transform .3s ease;
+    }
+    .ev-album-cover:hover .ev-cover-img{transform:scale(1.05);}
+    .ev-tag-overlay{
+      position:absolute; bottom:6px; right:6px;
+      width:32px; height:auto; opacity:.9;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
+    }
+    @media (max-width: 640px){
+      .ev-album-cover{width:80px; height:80px;}
+      .ev-tag-overlay{width:24px; bottom:4px; right:4px;}
+    }
     .ev-title{margin:0; font-size:18px; letter-spacing:.2px}
     .ev-title span{color:rgba(39,224,255,.95)}
     .ev-sub{margin:4px 0 0; color:var(--ev-muted); font-size:13px; line-height:1.35}
@@ -485,182 +509,6 @@
     .ev-bookletTrack b{display:block; font-size:13px}
     .ev-bookletTrack p{margin:6px 0 0; color:rgba(231,240,255,.80)}
 
-    /* CD Jewel Case Booklet */
-    .booklet-container{
-      max-width:900px; margin:0 auto; padding:20px 16px 40px;
-    }
-    .booklet-header{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:16px; flex-wrap:wrap; margin-bottom:24px;
-      padding-bottom:16px; border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .booklet-header h2{
-      margin:0; font-size:18px; font-weight:800;
-      color:rgba(39,224,255,.95);
-    }
-    .booklet-nav{
-      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    }
-    .booklet-page-indicator{
-      font-family:var(--ev-mono); font-size:12px;
-      color:var(--ev-muted); padding:6px 10px;
-      background:rgba(0,0,0,.2); border-radius:8px;
-      border:1px solid rgba(255,255,255,.08);
-      min-width:50px; text-align:center;
-    }
-    .booklet-pages-container{
-      perspective: 2500px;
-      perspective-origin: center center;
-      position:relative;
-      min-height:500px;
-      background:linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.1));
-      border-radius:16px;
-      padding:24px;
-    }
-    .booklet-page{
-      position:absolute;
-      width:calc(100% - 48px);
-      height:calc(100% - 48px);
-      transform-style:preserve-3d;
-      transform-origin:left center;
-      transition:transform .7s cubic-bezier(0.42, 0, 0.58, 1);
-      backface-visibility:hidden;
-      will-change:transform;
-    }
-    .booklet-page[data-page="1"]{z-index:4; transform:rotateY(0deg);}
-    .booklet-page[data-page="2"]{z-index:3; transform:rotateY(0deg);}
-    .booklet-page[data-page="3"]{z-index:2; transform:rotateY(0deg);}
-    .booklet-page[data-page="4"]{z-index:1; transform:rotateY(0deg);}
-    .booklet-page.flipped{
-      transform:rotateY(-180deg);
-      pointer-events:none;
-    }
-    /* Ensure only current page and previous pages are visible */
-    .booklet-page:not(.flipped){
-      pointer-events:auto;
-    }
-    .booklet-page-inner{
-      width:100%;
-      height:100%;
-      padding:24px 28px;
-      background:linear-gradient(180deg, rgba(15,20,28,.98), rgba(11,15,20,.98));
-      border:1px solid rgba(255,255,255,.12);
-      border-left:3px solid rgba(39,224,255,.25);
-      border-radius:4px;
-      color:rgba(231,240,255,.90);
-      overflow-y:auto;
-      box-shadow: 
-        inset 1px 0 0 rgba(255,255,255,.08),
-        0 2px 12px rgba(0,0,0,.4),
-        0 0 0 1px rgba(0,0,0,.2);
-      position:relative;
-    }
-    .booklet-page-inner::before{
-      content:"";
-      position:absolute;
-      left:0;
-      top:0;
-      bottom:0;
-      width:3px;
-      background:linear-gradient(180deg, rgba(255,255,255,.1), transparent);
-    }
-    .booklet-cover{
-      display:flex; align-items:center; justify-content:center;
-      padding:30px 20px;
-      background:linear-gradient(180deg, rgba(7,10,15,.98), rgba(11,15,20,.98));
-    }
-    .booklet-cover-wrapper{
-      position:relative;
-      width:100%;
-      max-width:400px;
-      border-radius:16px;
-      overflow:hidden;
-      box-shadow: 0 12px 48px rgba(0,0,0,.6);
-      border:2px solid rgba(255,255,255,.12);
-    }
-    .booklet-cover-img{
-      width:100%;
-      height:auto;
-      display:block;
-    }
-    .booklet-tag-overlay{
-      position:absolute;
-      bottom:12px;
-      right:12px;
-      width:48px;
-      height:auto;
-      opacity:.95;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,.7));
-    }
-    .booklet-image-gallery{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
-      gap:16px;
-      margin:20px 0 24px;
-    }
-    .booklet-image-item{
-      border-radius:12px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.2);
-      transition: transform .2s ease, border-color .2s ease;
-    }
-    .booklet-image-item:hover{
-      transform:translateY(-2px);
-      border-color:rgba(39,224,255,.25);
-    }
-    .booklet-gallery-img{
-      width:100%;
-      height:auto;
-      display:block;
-      object-fit:cover;
-    }
-    .booklet-img-caption{
-      margin:0;
-      padding:10px 12px;
-      font-size:11px;
-      text-align:center;
-      color:rgba(231,240,255,.75);
-      text-transform:uppercase;
-      letter-spacing:.5px;
-      border-top:1px solid rgba(255,255,255,.06);
-    }
-    .booklet-track{
-      padding:12px 12px;
-      border-radius:12px;
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      margin-top:10px;
-      cursor:pointer;
-      transition: all .15s ease;
-    }
-    .booklet-track:hover{
-      border-color:rgba(39,224,255,.25);
-      background:rgba(39,224,255,.06);
-    }
-    .booklet-track.active{
-      border-color:rgba(39,224,255,.45);
-      background:rgba(39,224,255,.10);
-    }
-    .booklet-track b{
-      display:block;
-      font-size:14px;
-      font-weight:800;
-      margin-bottom:6px;
-    }
-    .booklet-track p{
-      margin:0;
-      font-size:13px;
-      line-height:1.5;
-      color:rgba(231,240,255,.80);
-    }
-    @media (max-width: 768px){
-      .booklet-pages-container{padding:16px; min-height:400px;}
-      .booklet-page-inner{padding:16px 18px;}
-      .booklet-image-gallery{grid-template-columns:1fr; gap:12px;}
-      .booklet-cover-wrapper{max-width:100%;}
-    }
-
     /* Shortcuts Modal */
     .modal-overlay{
       position:fixed; inset:0; z-index:10000;
@@ -839,7 +687,6 @@
             <button class="tab" role="tab" aria-selected="false" data-scene="sceneMan">Manifesto</button>
             <button class="tab" role="tab" aria-selected="false" data-scene="sceneMap">2026 Map</button>
             <button class="tab" role="tab" aria-selected="false" data-scene="sceneCadence">Cadence</button>
-            <button class="tab" role="tab" aria-selected="false" data-scene="sceneBooklet">Booklet</button>
             <button class="tab" role="tab" aria-selected="false" data-scene="sceneCapsule">Capsule</button>
           </div>
         </div>
@@ -1160,134 +1007,6 @@
             </div>
           </div>
 
-          <!-- BOOKLET SCENE -->
-          <div class="scene" id="sceneBooklet">
-            <div class="booklet-container">
-              <div class="booklet-header">
-                <h2>Album Booklet — "COHERENCE BY DEFAULT"</h2>
-                <div class="booklet-nav">
-                  <button class="ev-btn ghost" id="booklet-prev" aria-label="Previous page" disabled>‹</button>
-                  <span class="booklet-page-indicator" id="booklet-page-indicator">1 / 4</span>
-                  <button class="ev-btn ghost" id="booklet-next" aria-label="Next page">›</button>
-                  <button class="ev-btn ghost" id="booklet-print">Print</button>
-                </div>
-              </div>
-              
-              <div class="booklet-pages-container" id="booklet-pages-container">
-                <!-- Page 1: Cover -->
-                <div class="booklet-page" data-page="1">
-                  <div class="booklet-page-inner booklet-cover">
-                    <div class="booklet-cover-wrapper">
-                      <img src="./images/album_cover.jpg" alt="COHERENCE BY DEFAULT" class="booklet-cover-img" />
-                      <img src="./icons/echostory_tag.png" alt="EchoStory" class="booklet-tag-overlay" />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Page 2: Inside Cover -->
-                <div class="booklet-page" data-page="2">
-                  <div class="booklet-page-inner">
-                    <h3>Album concept</h3>
-                    <p>
-                      This isn't a year recap — it's a systems log turned into music. The arc moves from sparks → spine:
-                      from proving you can build to building like the outcome is inevitable.
-                      The sound stays unmistakably Swamp-Hop: halftime pressure, engineered minimalism, warm truth,
-                      and a tiny bit of neon circuitry.
-                    </p>
-
-                    <div class="booklet-image-gallery">
-                      <div class="booklet-image-item">
-                        <img src="./images/the_spine.jpg" alt="The Spine" class="booklet-gallery-img" />
-                        <p class="booklet-img-caption">The Spine</p>
-                      </div>
-                      <div class="booklet-image-item">
-                        <img src="./images/the loop.jpg" alt="The Loop" class="booklet-gallery-img" />
-                        <p class="booklet-img-caption">The Loop</p>
-                      </div>
-                      <div class="booklet-image-item">
-                        <img src="./images/syslog.jpg" alt="Syslog" class="booklet-gallery-img" />
-                        <p class="booklet-img-caption">Syslog</p>
-                      </div>
-                    </div>
-
-                    <div class="ev-quote">
-                      <div class="ev-quoteKicker">Core mantra</div>
-                      <div class="ev-quoteText">"I build environments where good outcomes become the default."</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Page 3: Tracklist -->
-                <div class="booklet-page" data-page="3">
-                  <div class="booklet-page-inner">
-                    <h3>Tracklist + liner notes</h3>
-                    <div class="booklet-track" data-track="0">
-                      <b>A) Inevitable Spine</b>
-                      <p>The moment the builder becomes the architect. This is the thesis: no more flare-gun wins—just durable outcomes.</p>
-                    </div>
-                    <div class="booklet-track" data-track="1">
-                      <b>B) Year in Signals</b>
-                      <p>A readable signal inside the static. Integration over accumulation, clarity over volume, finishing over novelty.</p>
-                    </div>
-                    <div class="booklet-track" data-track="2">
-                      <b>C) Quarter Reel (Stabilize → Converge)</b>
-                      <p>Four-part montage: Q1 noise-cut, Q2 structural integrity, Q3 identity compression, Q4 convergence.</p>
-                    </div>
-                    <div class="booklet-track" data-track="3">
-                      <b>D) Guardrails (Double Down / Drop)</b>
-                      <p>Governance in chant form. If it doesn't connect or strengthen the system, it's optional.</p>
-                    </div>
-                    <div class="booklet-track" data-track="4">
-                      <b>E) Ecosystem Anthem (Orbit)</b>
-                      <p>The ecosystem in motion: divisions, systems, and the orbit of coherence around a central narrative.</p>
-                    </div>
-                    <div class="booklet-track" data-track="5">
-                      <b>F) Milestone Ledger</b>
-                      <p>The real work wins: milestones that matter, not the flash but the foundation built.</p>
-                    </div>
-                    <div class="booklet-track" data-track="6">
-                      <b>G) Standards (Ethics Over Noise)</b>
-                      <p>The moral and operational spine: policies consistent, escalations defined, clarity over ambiguity.</p>
-                    </div>
-                    <div class="booklet-track" data-track="7">
-                      <b>H) 2026 Map (P1 P2 P3)</b>
-                      <p>The roadmap forward: Phase 1 foundation, Phase 2 expansion, Phase 3 integration. The map to coherence.</p>
-                    </div>
-                    <div class="booklet-track" data-track="8">
-                      <b>I) Cadence / Seal (Future-Me Contract)</b>
-                      <p>The maintenance ritual: daily filter, weekly loop closure, monthly audit. The promise the system stays alive.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Page 4: Credits -->
-                <div class="booklet-page" data-page="4">
-                  <div class="booklet-page-inner">
-                    <h3>Credits (in-world)</h3>
-                    <ul>
-                      <li><b>Founder Voice:</b> Timbr (wise grit)</li>
-                      <li><b>Signal / Tech Prophet:</b> Byte</li>
-                      <li><b>Spine:</b> NXCore</li>
-                      <li><b>Cockpit:</b> AeroCoreOS</li>
-                      <li><b>Heartbeat:</b> EchoVerse</li>
-                    </ul>
-
-                    <h3>How to listen</h3>
-                    <p>
-                      First run: A → I in order. After that:
-                      discipline = D → C → I • meaning = A → I • systems = B → C → D.
-                    </p>
-
-                    <div class="ev-quote" style="margin-top:20px">
-                      <div class="ev-quoteKicker">Production Note</div>
-                      <div class="ev-quoteText">Systems log turned into Swamp-Hop. Sparks → Spine. Integration → Durability → Cadence.</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Capsule -->
           <div class="scene" id="sceneCapsule">
             <p class="title" style="margin:0 0 8px">EchoStory Capsule (Master)</p>
@@ -1407,6 +1126,10 @@
     <section id="echostory-coherence" class="ev-wrap">
       <header class="ev-hero">
         <img src="./icons/icon-192x192.png" alt="EchoStory" class="ev-sigil" aria-hidden="true" />
+        <div class="ev-album-cover">
+          <img src="./images/album_cover.jpg" alt="COHERENCE BY DEFAULT" class="ev-cover-img" />
+          <img src="./icons/echostory_tag.png" alt="EchoStory" class="ev-tag-overlay" />
+        </div>
         <div class="ev-heroText">
           <h2 class="ev-title">EchoStory Album Booklet — <span>"COHERENCE BY DEFAULT"</span></h2>
           <p class="ev-sub">
@@ -1510,6 +1233,68 @@
           </div>
         </article>
 
+        <!-- BOOKLET CARD -->
+        <aside class="ev-card ev-booklet" aria-label="Album booklet">
+          <div class="ev-cardHead">
+            <div>
+              <div class="ev-cardTitle">Album Booklet</div>
+              <div class="ev-cardHint">This page is designed to feel like a one-sheet insert.</div>
+            </div>
+            <button class="ev-btn ghost" id="ev-btn-print">Print</button>
+          </div>
+
+          <div class="ev-bookletBody" id="ev-bookletBody">
+            <h3>Album concept</h3>
+            <p>
+              This isn't a year recap — it's a systems log turned into music. The arc moves from sparks → spine:
+              from proving you can build to building like the outcome is inevitable.
+              The sound stays unmistakably Swamp-Hop: halftime pressure, engineered minimalism, warm truth,
+              and a tiny bit of neon circuitry.
+            </p>
+
+            <div class="ev-quote">
+              <div class="ev-quoteKicker">Core mantra</div>
+              <div class="ev-quoteText">"I build environments where good outcomes become the default."</div>
+            </div>
+
+            <h3>Tracklist + liner notes</h3>
+            <div class="ev-bookletTrack" data-track="0">
+              <b>A) Inevitable Spine</b>
+              <p>The moment the builder becomes the architect. This is the thesis: no more flare-gun wins—just durable outcomes.</p>
+            </div>
+            <div class="ev-bookletTrack" data-track="1">
+              <b>B) Year in Signals</b>
+              <p>A readable signal inside the static. Integration over accumulation, clarity over volume, finishing over novelty.</p>
+            </div>
+            <div class="ev-bookletTrack" data-track="2">
+              <b>C) Quarter Reel (Stabilize → Converge)</b>
+              <p>Four-part montage: Q1 noise-cut, Q2 structural integrity, Q3 identity compression, Q4 convergence.</p>
+            </div>
+            <div class="ev-bookletTrack" data-track="3">
+              <b>D) Guardrails (Double Down / Drop)</b>
+              <p>Governance in chant form. If it doesn't connect or strengthen the system, it's optional.</p>
+            </div>
+            <div class="ev-bookletTrack" data-track="4">
+              <b>I) Cadence / Seal (Future-Me Contract)</b>
+              <p>The maintenance ritual: daily filter, weekly loop closure, monthly audit. The promise the system stays alive.</p>
+            </div>
+
+            <h3>Credits (in-world)</h3>
+            <ul>
+              <li><b>Founder Voice:</b> Timbr (wise grit)</li>
+              <li><b>Signal / Tech Prophet:</b> Byte</li>
+              <li><b>Spine:</b> NXCore</li>
+              <li><b>Cockpit:</b> AeroCoreOS</li>
+              <li><b>Heartbeat:</b> EchoVerse</li>
+            </ul>
+
+            <h3>How to listen</h3>
+            <p>
+              First run: A → I in order. After that:
+              discipline = D → C → I • meaning = A → I • systems = B → C → D.
+            </p>
+          </div>
+        </aside>
       </div>
     </section>
   </div>
@@ -1591,78 +1376,18 @@
       }
     });
 
-    // ---------- Booklet Page Navigation (declare early) ----------
-    let currentBookletPage = 1;
-    const totalBookletPages = 4;
-    
-    function updateBookletPageNavigation(){
-      const bookletPrevBtn = document.getElementById('booklet-prev');
-      const bookletNextBtn = document.getElementById('booklet-next');
-      const bookletPageIndicator = document.getElementById('booklet-page-indicator');
-      const bookletPagesContainer = document.getElementById('booklet-pages-container');
-      
-      if(bookletPrevBtn) bookletPrevBtn.disabled = currentBookletPage === 1;
-      if(bookletNextBtn) bookletNextBtn.disabled = currentBookletPage === totalBookletPages;
-      if(bookletPageIndicator) bookletPageIndicator.textContent = `${currentBookletPage} / ${totalBookletPages}`;
-      
-      if(bookletPagesContainer){
-        for(let i = 1; i <= totalBookletPages; i++){
-          const page = bookletPagesContainer.querySelector(`[data-page="${i}"]`);
-          if(page){
-            // Pages should be visible (not flipped) if they are at or before the current page
-            // Pages after the current page should be flipped (hidden)
-            if(i <= currentBookletPage){
-              page.classList.remove('flipped');
-              // Ensure page is visible
-              page.style.visibility = 'visible';
-              page.style.opacity = '1';
-            }else{
-              page.classList.add('flipped');
-              // Hide pages that are flipped
-              page.style.visibility = 'hidden';
-              page.style.opacity = '0';
-            }
-          }
-        }
-      }
-    }
-
-    function goToBookletPage(page){
-      if(page < 1 || page > totalBookletPages) return;
-      currentBookletPage = page;
-      updateBookletPageNavigation();
-    }
-
-    function nextBookletPage(){
-      if(currentBookletPage < totalBookletPages) goToBookletPage(currentBookletPage + 1);
-    }
-
-    function prevBookletPage(){
-      if(currentBookletPage > 1) goToBookletPage(currentBookletPage - 1);
-    }
-
     // ---------- Tabs / Scenes ----------
     const tabs = [...document.querySelectorAll('.tab')];
     const scenes = [...document.querySelectorAll('.scene')];
 
     function showScene(id){
+      // Batch DOM updates for better performance
+      const isCapsule = id === 'sceneCapsule';
       scenes.forEach(s => s.classList.toggle('active', s.id === id));
       tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.scene === id ? 'true' : 'false'));
       localStorage.setItem('echostory_scene_master', id);
-      const modeLabelEl = document.getElementById('modeLabel');
-      if(modeLabelEl) modeLabelEl.textContent = (id === 'sceneCapsule') ? 'Ops / Capsule' : (id === 'sceneBooklet') ? 'Booklet' : 'Story Mode';
-      
-      // Reset booklet to page 1 when opening booklet scene
-      if(id === 'sceneBooklet'){
-        goToBookletPage(1);
-      }
+      document.getElementById('modeLabel').textContent = isCapsule ? 'Ops / Capsule' : 'Story Mode';
     }
-    
-    // Expose functions to window for access from IIFEs
-    window.showScene = showScene;
-    window.goToBookletPage = goToBookletPage;
-    window.nextBookletPage = nextBookletPage;
-    window.prevBookletPage = prevBookletPage;
 
     tabs.forEach(t => t.addEventListener('click', () => showScene(t.dataset.scene)));
     document.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => showScene(b.dataset.jump)));
@@ -1683,7 +1408,7 @@
     btnToggleAudio.addEventListener('click', async ()=>{
       if(ambience.paused){
         try{ await ambience.play(); setAudioStatus(true); }
-        catch(e){ setAudioStatus(false); alert('No ambience source loaded. Paste an audio URL in Operator Console, then Load.'); }
+        catch(e){ setAudioStatus(false); showToast('err', 'No ambience loaded', 'Paste an audio URL in Operator Console, then Load.', 4000); }
       }else{
         ambience.pause(); setAudioStatus(false);
       }
@@ -1698,7 +1423,7 @@
       src.type = url.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
       ambience.appendChild(src);
       try{ ambience.load(); await ambience.play(); setAudioStatus(true); }
-      catch(e){ setAudioStatus(false); alert('Could not play that URL. Make sure it is a direct link to an audio file.'); }
+      catch(e){ setAudioStatus(false); showToast('err', 'Could not play URL', 'Make sure it is a direct link to an audio file (mp3/wav).', 4000); }
     });
 
     document.getElementById('btnStopAudio').addEventListener('click', ()=>{
@@ -1875,7 +1600,7 @@
     }
 
     notesEl.addEventListener('input', ()=>{
-      window.clearTimeout(window.__evNoteTimer);
+      if(window.__evNoteTimer) window.clearTimeout(window.__evNoteTimer);
       window.__evNoteTimer = window.setTimeout(()=> autosave(), 350);
     });
     visibilityModeEl.addEventListener('change', autosave);
@@ -1933,7 +1658,7 @@
       const a = document.createElement('a');
       a.href = url; a.download = filename;
       document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(()=>URL.revokeObjectURL(url), 500);
+      if(url) setTimeout(()=>URL.revokeObjectURL(url), 500);
     }
 
     document.getElementById('btnCopyJson').addEventListener('click', async ()=>{
@@ -2037,7 +1762,7 @@ Coherence by default, that's the cure`
           letter: "B",
           title: "Year in Signals",
           fileStd: "year_in_signals.mp3",
-          fileAlt: "year_in_signals_(1).mp3",
+          fileAlt: "year_in_signals_(3).mp3",
           notes: "A readable signal inside the static: integration over accumulation, clarity over volume, finishing over novelty.",
           tags: ["signals", "integration", "clarity", "finish"],
           lyrics: `[INTRO - SIGNAL TONE]
@@ -2349,9 +2074,11 @@ Coherence by default - we committed to it`
         lyricsPanel: document.getElementById("ev-lyrics-panel"),
         lyricsContent: document.getElementById("ev-lyrics-content"),
         lastSaved: document.getElementById("ev-lastSaved"),
+        btnPrint: document.getElementById("ev-btn-print"),
         btnCopy: document.getElementById("ev-btn-copy"),
         btnBooklet: document.getElementById("ev-btn-booklet"),
         saveBadge: document.getElementById("ev-saveBadge"),
+        bookletBody: document.getElementById("ev-bookletBody"),
         versionBadge: document.getElementById("ev-versionBadge"),
         vStd: document.getElementById("ev-vStd"),
         vAlt: document.getElementById("ev-vAlt"),
@@ -2408,18 +2135,16 @@ Coherence by default - we committed to it`
       // UI Render
       // ---------------------------
       function renderList(){
-        if(!el.list){
-          console.error('Playlist element (ev-list) not found');
-          return;
-        }
-        el.list.innerHTML = "";
+        const fragment = document.createDocumentFragment();
         playlist.forEach((t, i) => {
           const row = document.createElement("div");
           row.className = "ev-row" + (i===state.idx ? " active" : "");
           row.tabIndex = 0;
+
           const meta = t.fileAlt
             ? `${t.fileStd}  •  v2: ${t.fileAlt}`
             : `${t.fileStd}  •  v2: —`;
+
           row.innerHTML = `
             <div class="ev-rowLeft">
               <span class="ev-chip">${t.letter}</span>
@@ -2432,15 +2157,23 @@ Coherence by default - we committed to it`
               <span class="ev-small">Tap</span>
             </div>
           `;
-          row.addEventListener("click", ()=> selectTrack(i, true));
+
+          // Use event delegation instead of individual listeners for better performance
+          row.addEventListener("click", (e)=>{
+            if(e.target.closest('.ev-row')) selectTrack(i, true);
+          });
           row.addEventListener("keydown", (e)=>{
-            if(e.key === "Enter" || e.key === " "){
+            if((e.key === "Enter" || e.key === " ") && e.target.closest('.ev-row')){
               e.preventDefault();
               selectTrack(i, true);
             }
           });
-          el.list.appendChild(row);
+
+          fragment.appendChild(row);
         });
+
+        el.list.innerHTML = "";
+        el.list.appendChild(fragment);
       }
 
       function renderNow(){
@@ -2539,17 +2272,15 @@ Coherence by default - we committed to it`
         const t = playlist[state.idx];
         let file = (state.version === "alt" && t.fileAlt) ? t.fileAlt : t.fileStd;
 
-        // Full mode adds track letter prefix (a, b, c, d, i) to whichever take is selected
+        // Full mode adds track letter prefix (a, b, c, d, e, f, g, h, i) to whichever take is selected
         if(state.source === "ai"){
           const letter = t.letter.toLowerCase();
-          // For v2 files, replace _(1) with (1) to match Full mode naming
-          if(state.version === "alt" && file.includes("_(1)")){
-            file = file.replace("_(1)", "(1)");
-          }
+          // For v2 files, replace _([number]) with ([number]) to match Full mode naming
+          file = file.replace(/_(\(\d+\))/g, '$1');
           file = letter + ")" + file;
         }
 
-        // Update audio src
+        // Update audio src (GitHub Pages may not handle encoded URLs properly)
         audio.src = basePath + file;
         el.file.textContent = file;
       }
@@ -2623,31 +2354,40 @@ Coherence by default - we committed to it`
         setPlayButton();
       });
 
-      audio.addEventListener("timeupdate", ()=>{
-        if(!seeking){
-          const dur = audio.duration || 0;
-          const cur = audio.currentTime || 0;
-          const v = dur ? Math.round((cur/dur)*1000) : 0;
-          el.seek.value = String(v);
-        }
-        el.cur.textContent = fmt(audio.currentTime || 0);
-        el.dur.textContent = fmt(audio.duration || 0);
-        el.time.textContent = `${fmt(audio.currentTime || 0)} / ${fmt(audio.duration || 0)}`;
-
-        // autosave throttle
-        if((audio.currentTime || 0) > 0){
-          if(!window.__evSaveTick || Date.now() - window.__evSaveTick > 2500){
-            window.__evSaveTick = Date.now();
-            saveState({ ...state, t: audio.currentTime || 0, vol: audio.volume, loop: state.loop, lyrics: state.lyrics, version: state.version, source: state.source });
+        audio.addEventListener("timeupdate", ()=>{
+          if(!seeking){
+            const dur = audio.duration || 0;
+            const cur = audio.currentTime || 0;
+            const v = dur ? Math.round((cur/dur)*1000) : 0;
+            el.seek.value = String(v);
           }
-        }
-      });
+
+          // Cache time formatting to avoid repeated calculations
+          const currentTime = audio.currentTime || 0;
+          const duration = audio.duration || 0;
+          el.cur.textContent = fmt(currentTime);
+          el.dur.textContent = fmt(duration);
+          el.time.textContent = `${fmt(currentTime)} / ${fmt(duration)}`;
+
+          // autosave throttle - only save if playing and time has changed significantly
+          if(currentTime > 0 && !audio.paused){
+            if(!window.__evSaveTick || Date.now() - window.__evSaveTick > 2500){
+              window.__evSaveTick = Date.now();
+              saveState({ ...state, t: currentTime, vol: audio.volume, loop: state.loop, lyrics: state.lyrics, version: state.version, source: state.source });
+            }
+          }
+        });
 
       audio.addEventListener("ended", ()=>{
         // If loop is off, advance
         if(!state.loop){
           next(true);
         }
+      });
+
+      audio.addEventListener("error", (e)=>{
+        console.error('Audio load error:', e.target.error, 'File:', audio.src);
+        showToast('err', 'Audio failed to load', 'Check file or try different take', 4000);
       });
 
       el.seek.addEventListener("input", ()=>{
@@ -2676,7 +2416,7 @@ Coherence by default - we committed to it`
 
       el.play.addEventListener("click", ()=>{
         if(audio.paused){
-          audio.play().catch(()=>{});
+          audio.play().catch(()=>{ /* ignore autoplay restrictions */ });
         }else{
           audio.pause();
         }
@@ -2686,9 +2426,15 @@ Coherence by default - we committed to it`
       el.prev.addEventListener("click", ()=> prev(true));
       el.next.addEventListener("click", ()=> next(true));
 
+      // Cache volume value to avoid unnecessary conversions and saves
+      let lastVolume = audio.volume;
       el.vol.addEventListener("input", ()=>{
-        audio.volume = Number(el.vol.value);
-        saveState({ ...state, t: audio.currentTime || 0, vol: audio.volume, loop: state.loop, lyrics: state.lyrics, version: state.version, source: state.source });
+        const newVol = Number(el.vol.value);
+        if(Math.abs(newVol - lastVolume) > 0.01){ // Only save if changed significantly
+          lastVolume = newVol;
+          audio.volume = newVol;
+          saveState({ ...state, t: audio.currentTime || 0, vol: newVol, loop: state.loop, lyrics: state.lyrics, version: state.version, source: state.source });
+        }
       });
 
       el.loop.addEventListener("click", ()=> setLoop(!state.loop));
@@ -2714,14 +2460,14 @@ Coherence by default - we committed to it`
         });
       });
 
-      // Print button removed (now in booklet scene)
+      el.btnPrint.addEventListener("click", ()=> window.print());
 
       el.btnCopy.addEventListener("click", async ()=>{
         const lines = playlist.map(t => {
           const alt = t.fileAlt ? t.fileAlt : "—";
           const letter = t.letter.toLowerCase();
           const fullV1 = letter + ")" + t.fileStd;
-          const fullV2 = alt === "—" ? "—" : letter + ")" + alt.replace("_(1)", "(1)");
+          const fullV2 = alt === "—" ? "—" : letter + ")" + alt.replace(/_(\(\d+\))/g, '$1');
           return `${t.letter}) ${t.title}\n   v1: ${t.fileStd}\n   v2:  ${alt}\n   Full v1: ${fullV1}\n   Full v2:  ${fullV2}`;
         });
         const txt = `EchoStory — COHERENCE BY DEFAULT\n\n` + lines.join("\n\n");
@@ -2734,42 +2480,10 @@ Coherence by default - we committed to it`
         }
       });
 
-      // Navigate to booklet scene
-      const btnBookletEl = document.getElementById("ev-btn-booklet");
-      if(btnBookletEl){
-        btnBookletEl.addEventListener("click", (e)=>{
-          e.preventDefault();
-          e.stopPropagation();
-          // Use window.showScene if available, otherwise fallback
-          const sceneFunc = window.showScene;
-          if(typeof sceneFunc === 'function'){
-            sceneFunc('sceneBooklet');
-          }else{
-            // Fallback: directly activate the scene
-            const bookletScene = document.getElementById('sceneBooklet');
-            const bookletTab = document.querySelector('[data-scene="sceneBooklet"]');
-            if(bookletScene){
-              document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
-              bookletScene.classList.add('active');
-              if(bookletTab){
-                document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', 'false'));
-                bookletTab.setAttribute('aria-selected', 'true');
-              }
-              localStorage.setItem('echostory_scene_master', 'sceneBooklet');
-              const modeLabel = document.getElementById('modeLabel');
-              if(modeLabel) modeLabel.textContent = 'Story Mode';
-              // Reset booklet to page 1
-              if(typeof window.goToBookletPage === 'function'){
-                window.goToBookletPage(1);
-              }
-            }else{
-              console.error('Booklet scene not found');
-            }
-          }
-        });
-      }else{
-        console.warn('Booklet button (ev-btn-booklet) not found');
-      }
+      // Toggle booklet scroll focus (mobile convenience)
+      el.btnBooklet.addEventListener("click", ()=>{
+        el.bookletBody.scrollIntoView({behavior:"smooth", block:"start"});
+      });
 
       // Keyboard shortcuts
       window.addEventListener("keydown", (e)=>{
@@ -2795,27 +2509,8 @@ Coherence by default - we committed to it`
         if(e.key === "s" || e.key === "S"){
           setSource(state.source === "ai" ? "human" : "ai");
         }
-        // Booklet page navigation (when booklet scene is active)
-        const bookletScene = document.getElementById('sceneBooklet');
-        const bookletVisible = bookletScene && bookletScene.classList.contains('active');
-        if(bookletVisible && (e.key === "ArrowRight" || e.key === "ArrowLeft")){
-          const isSeeking = e.target && (e.target.id === "ev-seek" || e.target.id === "ev-vol");
-          if(!isSeeking){
-            if(e.key === "ArrowRight"){
-              e.preventDefault();
-              nextBookletPage();
-              return;
-            }
-            if(e.key === "ArrowLeft"){
-              e.preventDefault();
-              prevBookletPage();
-              return;
-            }
-          }
-        }
-        
-        if(e.key === "ArrowRight" && !bookletVisible){ audio.currentTime = Math.min((audio.currentTime||0)+5, audio.duration||1e9); }
-        if(e.key === "ArrowLeft" && !bookletVisible){ audio.currentTime = Math.max((audio.currentTime||0)-5, 0); }
+        if(e.key === "ArrowRight"){ audio.currentTime = Math.min((audio.currentTime||0)+5, audio.duration||1e9); }
+        if(e.key === "ArrowLeft"){ audio.currentTime = Math.max((audio.currentTime||0)-5, 0); }
         if(e.key === "?" || e.key === "/"){
           e.preventDefault();
           showShortcuts();
@@ -2831,25 +2526,22 @@ Coherence by default - we committed to it`
       el.lyrics.textContent = state.lyrics ? "Hide Lyrics" : "Lyrics";
       setVersionUI();
 
-      // Verify elements exist before rendering
-      if(!el.list){
-        console.error('Playlist element (ev-list) not found. Cannot render playlist.');
-      }else{
-        renderList();
-      }
+      renderList();
       setAudioSrc();
       renderNow();
 
-      // Show saved time badge if exists
-      try{
-        const raw = localStorage.getItem(LS_KEY);
-        if(raw){
-          const parsed = JSON.parse(raw);
-          if(parsed.savedAt){
-            el.lastSaved.textContent = "Last saved: " + new Date(parsed.savedAt).toLocaleString();
+        // Show saved time badge if exists
+        try{
+          const raw = localStorage.getItem(LS_KEY);
+          if(raw){
+            const parsed = JSON.parse(raw);
+            if(parsed.savedAt){
+              el.lastSaved.textContent = "Last saved: " + new Date(parsed.savedAt).toLocaleString();
+            }
           }
+        }catch(e){
+          console.warn('Failed to load saved state:', e);
         }
-      }catch(e){}
 
       // Attempt to restore last position
       audio.addEventListener("canplay", ()=>{
@@ -2868,49 +2560,6 @@ Coherence by default - we committed to it`
         renderNow();
       }
 
-      // Booklet page navigation event listeners
-      const bookletPrevBtn = document.getElementById('booklet-prev');
-      const bookletNextBtn = document.getElementById('booklet-next');
-      const bookletPagesContainer = document.getElementById('booklet-pages-container');
-
-      if(bookletPrevBtn) bookletPrevBtn.addEventListener('click', prevBookletPage);
-      if(bookletNextBtn) bookletNextBtn.addEventListener('click', nextBookletPage);
-      
-      // Click pages to flip forward (only on current visible page, not on interactive elements)
-      if(bookletPagesContainer){
-        bookletPagesContainer.addEventListener('click', (e)=>{
-          const page = e.target.closest('.booklet-page');
-          const isInteractive = e.target.closest('button, a, .booklet-track, .booklet-image-item');
-          if(page && !isInteractive){
-            const pageNum = Number(page.getAttribute('data-page'));
-            if(pageNum === currentBookletPage && currentBookletPage < totalBookletPages){
-              nextBookletPage();
-            }
-          }
-        });
-      }
-
-      // Booklet track click handlers
-      if(bookletPagesContainer){
-        bookletPagesContainer.addEventListener("click", (e)=>{
-          const track = e.target.closest(".booklet-track");
-          if(track){
-            const idx = Number(track.getAttribute("data-track"));
-            if(Number.isFinite(idx)){
-              selectTrack(idx, true);
-              // Flip to tracklist page (page 3) when track is clicked
-              if(currentBookletPage !== 3) goToBookletPage(3);
-            }
-          }
-        });
-      }
-
-      // Initialize booklet page navigation
-      updateBookletPageNavigation();
-
-      // Print button
-      const bookletPrintBtn = document.getElementById('booklet-print');
-      if(bookletPrintBtn) bookletPrintBtn.addEventListener('click', ()=> window.print());
     })();
   </script>
   

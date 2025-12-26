@@ -34,11 +34,6 @@
 
   async function registerSW(){
     if (!("serviceWorker" in navigator)) return;
-    // Skip registration for file:// protocol (local testing)
-    if (window.location.protocol === 'file:') {
-      log("SW registration skipped (file:// protocol)");
-      return;
-    }
     try {
       const reg = await navigator.serviceWorker.register("./sw.js", { scope: "./" });
       log("SW registered", reg);
