@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EchoStory — The Year the System Woke Up (Comprehensive)</title>
+  <meta name="theme-color" content="#0b0f14" />
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#0f1620; --panel2:#0c121a;
+      --txt:#e7f0ff; --muted:#9fb3cc;
+      --a:#7c5cff; --b:#27e0ff; --g:#2cff8f; --y:#ffd34d; --r:#ff4d6d;
+      --br:18px; --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --stroke: rgba(255,255,255,.08);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans); color:var(--txt);
+      background:
+        radial-gradient(1200px 800px at 20% -10%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(900px 700px at 90% 10%, rgba(39,224,255,.14), transparent 55%),
+        radial-gradient(800px 650px at 30% 90%, rgba(44,255,143,.10), transparent 60%),
+        linear-gradient(180deg, #070a0f, var(--bg));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1160px; margin:0 auto; padding:28px 16px 64px;}
+    .top{display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
+    .brand{display:flex; gap:12px; align-items:center;}
+    .sig{
+      width:44px; height:44px; border-radius:14px;
+      background: conic-gradient(from 180deg, rgba(124,92,255,.95), rgba(39,224,255,.85), rgba(44,255,143,.85), rgba(255,211,77,.85), rgba(255,77,109,.85), rgba(124,92,255,.95));
+      box-shadow: 0 10px 40px rgba(124,92,255,.22);
+      position:relative;
+    }
+    .sig:after{
+      content:""; position:absolute; inset:2px; border-radius:12px;
+      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.2));
+      border:1px solid rgba(255,255,255,.08);
+    }
+    h1{margin:0; font-size:20px; letter-spacing:.2px}
+    .sub{color:var(--muted); font-size:13px; margin-top:2px}
+    .pillbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .pill{
+      padding:9px 12px; border-radius:999px; background:rgba(255,255,255,.05);
+      border:1px solid var(--stroke);
+      color:var(--muted); font-size:12px; display:flex; gap:8px; align-items:center;
+      backdrop-filter: blur(10px);
+    }
+    .pill strong{color:var(--txt); font-weight:650}
+    .grid{display:grid; grid-template-columns: 1.3fr .7fr; gap:16px; margin-top:16px;}
+    @media (max-width: 960px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--stroke);
+      border-radius:var(--br);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:16px 16px 12px;
+      background:linear-gradient(180deg, rgba(0,0,0,.25), transparent);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .title{font-size:14px; font-weight:750; margin:0}
+    .hint{font-size:12px; color:var(--muted); margin-top:6px; line-height:1.35}
+    .bd{padding:14px 16px 16px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      padding:10px 12px; border-radius:12px;
+      background:rgba(124,92,255,.15);
+      color:var(--txt); font-weight:700; font-size:13px;
+      border:1px solid rgba(124,92,255,.35);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px); background:rgba(124,92,255,.2); border-color:rgba(124,92,255,.55)}
+    .btn.secondary{background:rgba(39,224,255,.10); border-color:rgba(39,224,255,.35)}
+    .btn.ghost{background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12); color:var(--muted); font-weight:650}
+    .btn.danger{background:rgba(255,77,109,.12); border-color:rgba(255,77,109,.35)}
+    .sep{height:1px; background:rgba(255,255,255,.08); margin:12px 0}
+    .tabs{display:flex; gap:8px; flex-wrap:wrap}
+    .tab{
+      padding:9px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04); color:var(--muted); font-weight:650; font-size:12px;
+      cursor:pointer; user-select:none;
+    }
+    .tab[aria-selected="true"]{
+      color:var(--txt);
+      border-color:rgba(39,224,255,.42);
+      background:rgba(39,224,255,.10);
+    }
+    .scene{display:none; animation: fadeIn .22s ease both;}
+    .scene.active{display:block}
+    @keyframes fadeIn{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
+
+    .quote{
+      padding:14px 14px;
+      border-radius:14px;
+      background:linear-gradient(180deg, rgba(12,18,26,.75), rgba(12,18,26,.35));
+      border:1px solid rgba(255,255,255,.10);
+      line-height:1.55;
+      position:relative;
+      overflow:hidden;
+    }
+    .quote:before{
+      content:""; position:absolute; inset:-80px;
+      background:
+        radial-gradient(360px 180px at 15% 30%, rgba(39,224,255,.18), transparent 60%),
+        radial-gradient(340px 160px at 80% 70%, rgba(124,92,255,.16), transparent 62%);
+      opacity:.9;
+    }
+    .quote > *{position:relative}
+    .mono{font-family:var(--mono); font-size:12px; color:rgba(231,240,255,.78)}
+    .kicker{
+      font-size:12px; color:rgba(231,240,255,.85);
+      display:flex; gap:8px; align-items:center;
+      margin-bottom:8px;
+    }
+    .dot{width:8px; height:8px; border-radius:99px; background:rgba(44,255,143,.9); box-shadow: 0 0 0 6px rgba(44,255,143,.12)}
+    .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .chip{
+      font-size:11px; padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:rgba(231,240,255,.75);
+    }
+    .checklist{display:grid; gap:8px}
+    .item{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px; border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .item input{margin-top:3px; transform:scale(1.1)}
+    .item .lbl{font-size:13px; line-height:1.35}
+    .item .lbl b{font-weight:800}
+    .small{font-size:12px; color:var(--muted)}
+    .meter{
+      height:10px; border-radius:999px; background:rgba(255,255,255,.08);
+      overflow:hidden; border:1px solid rgba(255,255,255,.10);
+    }
+    .meter > div{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, rgba(39,224,255,.9), rgba(124,92,255,.9), rgba(44,255,143,.9));
+      transition: width .25s ease;
+    }
+    textarea, input[type="text"], select{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--txt);
+      outline:none;
+      font-size:13px;
+    }
+    textarea{min-height:120px; resize:vertical}
+    .footer{
+      margin-top:16px; color:var(--muted); font-size:12px; line-height:1.45;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .badge{
+      font-family:var(--mono);
+      font-size:11px;
+      color:rgba(231,240,255,.75);
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      padding:6px 10px;
+      border-radius:999px;
+    }
+    .glowline{
+      height:1px; background:linear-gradient(90deg, transparent, rgba(39,224,255,.25), rgba(124,92,255,.25), rgba(44,255,143,.18), transparent);
+      margin:16px 0;
+    }
+    .twoCol{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width: 900px){ .twoCol{grid-template-columns:1fr} }
+
+    /* subtle animated particles */
+    .bgfx{pointer-events:none; position:fixed; inset:0; opacity:.55; mix-blend-mode:screen;}
+    .bgfx span{position:absolute; width:2px; height:2px; border-radius:999px; background:rgba(39,224,255,.9); animation: drift linear infinite; opacity:.65;}
+    @keyframes drift{
+      from{transform:translate3d(0,0,0); opacity:.0}
+      15%{opacity:.7}
+      85%{opacity:.7}
+      to{transform:translate3d(0,-120vh,0); opacity:0}
+    }
+
+    /* print-friendly */
+    @media print{
+      body{background:#fff !important; color:#000 !important}
+      .bgfx, .pillbar, .tabs, .btn, .asideOnly{display:none !important}
+      .card{box-shadow:none !important}
+      .quote{background:#fff !important; border:1px solid #ddd !important}
+      .mono,.small{color:#333 !important}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bgfx" id="bgfx" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="sig" aria-hidden="true"></div>
+        <div>
+          <h1>EchoStory — <span style="color:rgba(39,224,255,.95)">The Year the System Woke Up</span></h1>
+          <div class="sub">Comprehensive capsule: year signals → quarters → guardrails → philosophy → manifesto → 2026 map → cadence → exports.</div>
+        </div>
+      </div>
+      <div class="pillbar">
+        <div class="pill"><span>🧠</span><strong id="modeLabel">Story Mode</strong></div>
+        <div class="pill"><span>🧭</span><span>Mantra:</span><strong id="mantraPill">I build environments where good outcomes become the default.</strong></div>
+        <div class="pill"><span>💾</span><span>Autosave:</span><strong>On</strong></div>
+        <div class="pill"><span>⚙️</span><span class="mono" id="capsuleId">EV-CAPSULE-2026</span></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Story + Tabs -->
+      <section class="card" aria-label="EchoStory narrative">
+        <div class="hd">
+          <div>
+            <p class="title">Scenes</p>
+            <p class="hint">This is the most comprehensive EchoStory capsule to date. Tap scenes like chapters. Everything can be sealed into the Capsule.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Scene tabs">
+            <button class="tab" role="tab" aria-selected="true" data-scene="scene0">Prologue</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="sceneSignals">Year Signals</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="sceneQuarters">Quarter Reel</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="sceneGuardrails">Guardrails</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="scenePhilo">Philosophy</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="sceneMan">Manifesto</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="sceneMap">2026 Map</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="sceneCadence">Cadence</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="sceneCapsule">Capsule</button>
+          </div>
+        </div>
+
+        <div class="bd">
+          <!-- Prologue -->
+          <div class="scene active" id="scene0">
+            <div class="quote">
+              <div class="kicker"><span class="dot"></span><b>PROLOGUE</b> <span class="small">— from proving → to inevitability</span></div>
+              <p>
+                There was a time when every new idea felt like a flare in the sky:
+                bright, loud, and gone before anyone could read the message.
+              </p>
+              <p>
+                This year didn’t chase flares.
+                This year forged a <b>spine</b>.
+              </p>
+              <p>
+                The system didn’t become bigger. It became <b>coherent</b>.
+                Tools started to talk. Story started to function. Noise turned into signal.
+              </p>
+
+              <div class="glowline"></div>
+
+              <p class="mono"><b>Operator mantra:</b> I build environments where good outcomes become the default.</p>
+              <p class="mono"><b>Daily filter:</b> Does this reduce friction, deepen meaning, or strengthen the system?</p>
+
+              <div class="chips">
+                <span class="chip">Integration over accumulation</span>
+                <span class="chip">Meaning before polish</span>
+                <span class="chip">Long arcs over loud moments</span>
+                <span class="chip">Subtraction is creation</span>
+              </div>
+
+              <div class="glowline"></div>
+              <p class="mono">LOG: Integrity ↑ • Friction ↓ • Identity compressed • Convergence achieved</p>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="row">
+              <button class="btn" data-jump="sceneSignals">Continue →</button>
+              <button class="btn ghost" id="btnToggleAudio">Enable ambience</button>
+              <span class="small" id="audioStatus">Ambience: Off</span>
+            </div>
+
+            <audio id="ambience" loop preload="none"></audio>
+          </div>
+
+          <!-- Year Signals -->
+          <div class="scene" id="sceneSignals">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(255,211,77,.95); box-shadow:0 0 0 6px rgba(255,211,77,.14)"></span><b>YEAR IN SIGNALS</b></div>
+              <p><b>You didn’t just build things — you integrated.</b> This year was about connection: systems, story, output, and intention.</p>
+              <p><b>You chose infrastructure over applause.</b> You invested in what lasts: structure, clarity, documentation, and defaults.</p>
+              <p><b>Your creative voice sharpened.</b> Not louder — clearer. The output gained rules, boundaries, and identity.</p>
+              <p><b>You closed loops.</b> Instead of chasing novelty, you revisited, repaired, hardened, and finished.</p>
+              <p><b>You stayed aligned.</b> Even under pressure, you didn’t lose the center. Meaning stayed in the driver’s seat.</p>
+              <div class="glowline"></div>
+              <p class="mono">Signal summary: coherence > volume. durability > hype. completion > novelty.</p>
+            </div>
+
+            <div class="sep"></div>
+            <div class="row">
+              <button class="btn secondary" data-jump="sceneQuarters">Quarter Reel →</button>
+              <button class="btn ghost" data-jump="sceneCapsule">Seal to Capsule →</button>
+            </div>
+          </div>
+
+          <!-- Quarter Reel -->
+          <div class="scene" id="sceneQuarters">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(39,224,255,.95); box-shadow:0 0 0 6px rgba(39,224,255,.14)"></span><b>QUARTER REEL</b> <span class="small">— the arc in four moves</span></div>
+
+              <p><b>Q1 — Clearing the Noise:</b> you stopped mistaking activity for progress. You reclaimed authority over your roadmap.</p>
+              <p><b>Q2 — Structural Integrity:</b> builder energy evolved into architect behavior. Decisions became durable, not disposable.</p>
+              <p><b>Q3 — Identity Compression:</b> you learned subtraction is a creative act. Output got intentional; systems got coherent.</p>
+              <p><b>Q4 — System Convergence:</b> everything started orbiting one center. Tools supported story; story supported function.</p>
+
+              <div class="glowline"></div>
+              <p class="mono">Quarter thesis: stabilize → structure → compress → converge.</p>
+            </div>
+
+            <div class="sep"></div>
+            <div class="row">
+              <button class="btn secondary" data-jump="sceneGuardrails">Guardrails →</button>
+              <button class="btn ghost" data-jump="sceneSignals">Back to Signals</button>
+            </div>
+          </div>
+
+          <!-- Guardrails -->
+          <div class="scene" id="sceneGuardrails">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(255,77,109,.95); box-shadow:0 0 0 6px rgba(255,77,109,.14)"></span><b>GUARDRAILS</b> <span class="small">— double down / drop</span></div>
+
+              <div class="twoCol">
+                <div>
+                  <p><b>DOUBLE DOWN</b></p>
+                  <ul>
+                    <li><b>Integration-first thinking</b> — connected systems win.</li>
+                    <li><b>Narrative-backed systems</b> — tools carry meaning; story has function.</li>
+                    <li><b>Finishing energy</b> — closing loops is leverage.</li>
+                    <li><b>Internal coherence</b> — if it makes sense inside, it will scale outside.</li>
+                  </ul>
+                </div>
+                <div>
+                  <p><b>DROP / REDUCE</b></p>
+                  <ul>
+                    <li><b>Over-rescuing half-ideas</b> — some projects already did their job (teach).</li>
+                    <li><b>Explaining before shipping</b> — presence > persuasion.</li>
+                    <li><b>Over-polishing before meaning</b> — clarity first; shine later.</li>
+                    <li><b>Re-litigating decisions</b> — choose, then move.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="glowline"></div>
+              <p class="mono">Guardrail test: if it doesn’t reduce friction, deepen meaning, or strengthen the system — it’s optional.</p>
+            </div>
+
+            <div class="sep"></div>
+            <div class="row">
+              <button class="btn secondary" data-jump="scenePhilo">Philosophy →</button>
+              <button class="btn ghost" data-jump="sceneCapsule">Seal to Capsule →</button>
+            </div>
+          </div>
+
+          <!-- Philosophy -->
+          <div class="scene" id="scenePhilo">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(39,224,255,.95); box-shadow:0 0 0 6px rgba(39,224,255,.14)"></span><b>PERSONAL OPERATING PHILOSOPHY</b></div>
+              <p><b>Core premise:</b> I operate as a system steward, not a task executor. My job is to create environments where good outcomes become the default.</p>
+              <p><b>1 — Integration beats accumulation.</b> If it doesn’t connect, it doesn’t belong.</p>
+              <p><b>2 — Meaning precedes optimization.</b> I do not polish confusion.</p>
+              <p><b>3 — Infrastructure is an act of care.</b> Systems should respect future users — including future me.</p>
+              <p><b>4 — Subtraction is creation.</b> Removing the wrong thing is as valuable as building the right one.</p>
+              <p><b>5 — Long arcs over loud moments.</b> Durability over applause.</p>
+              <p><b>6 — Trust decisions once made.</b> Re-litigating is disguised fear.</p>
+              <div class="glowline"></div>
+              <p class="mono"><b>Daily filter:</b> reduce friction • deepen meaning • strengthen system</p>
+            </div>
+
+            <div class="sep"></div>
+            <div class="row">
+              <button class="btn secondary" data-jump="sceneMan">Manifesto →</button>
+              <button class="btn ghost" data-jump="sceneCadence">Cadence →</button>
+            </div>
+          </div>
+
+          <!-- Manifesto -->
+          <div class="scene" id="sceneMan">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(124,92,255,.95); box-shadow:0 0 0 6px rgba(124,92,255,.14)"></span><b>FOUNDER LETTER / MANIFESTO</b></div>
+              <p>I didn’t start this to chase trends. I started it because systems were broken — and people were expected to adapt instead of being supported.</p>
+              <p>AeroVista exists to prove something simple: infrastructure and creativity are not opposites. They are partners.</p>
+              <p>We build tools that carry story. We tell stories that function.</p>
+              <p>We believe: good systems feel human • documentation is respect • silence can be intentional • durability is more impressive than speed.</p>
+              <p>We don’t ship noise. We ship clarity. We don’t build for everyone. We build for those who notice.</p>
+              <p>If you’re here, it’s because something resonated — not because we explained it well enough. That’s intentional.</p>
+              <div class="glowline"></div>
+              <p class="mono">— Founder</p>
+            </div>
+
+            <div class="sep"></div>
+            <div class="row">
+              <button class="btn secondary" data-jump="sceneMap">Open 2026 Map →</button>
+              <button class="btn ghost" data-jump="sceneCapsule">Seal to Capsule →</button>
+            </div>
+          </div>
+
+          <!-- 2026 Map -->
+          <div class="scene" id="sceneMap">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(44,255,143,.95); box-shadow:0 0 0 6px rgba(44,255,143,.14)"></span><b>2026 PRIORITIES</b> <span class="small">— P1 / P2 / P3 + 12-month arc</span></div>
+
+              <p><b>P1 (Non-Negotiables):</b></p>
+              <ul>
+                <li><b>Harden the spine:</b> stability + observability; UX consistency; close UI gaps for already-built capability.</li>
+                <li><b>Reduce cognitive load:</b> fewer dashboards; stronger defaults; one source of truth per system.</li>
+                <li><b>Finish quiet gaps:</b> docs + onboarding; remove “I’ll remember” dependencies.</li>
+              </ul>
+
+              <p><b>P2 (Expansion with discipline):</b></p>
+              <ul>
+                <li><b>Selective exposure:</b> controlled presence; observe friction honestly.</li>
+                <li><b>Creative output with purpose:</b> fewer drops; stronger narrative ties; no “just because” releases.</li>
+                <li><b>Light collaboration:</b> plug-in ready; low-risk; no rewrites for others yet.</li>
+              </ul>
+
+              <p><b>P3 (Optional):</b></p>
+              <ul>
+                <li><b>Monetization experiments:</b> only if non-distorting.</li>
+                <li><b>New projects:</b> only if they reuse infrastructure with no net-new maintenance burden.</li>
+                <li><b>Delight layer:</b> aesthetics/animations after function is complete.</li>
+              </ul>
+
+              <div class="glowline"></div>
+
+              <p><b>12-month arc (likely):</b></p>
+              <ul>
+                <li><b>Months 1–3:</b> refinement + friction removal (spine hardening).</li>
+                <li><b>Months 4–6:</b> selective visibility (presence without chasing).</li>
+                <li><b>Months 7–12:</b> orchestration (systems work without you present).</li>
+              </ul>
+
+              <div class="glowline"></div>
+              <p class="mono">End state: other people can enter the ecosystem and understand it without you present.</p>
+            </div>
+
+            <div class="sep"></div>
+            <div class="row">
+              <button class="btn secondary" data-jump="sceneCadence">Cadence →</button>
+              <button class="btn ghost" id="btnExportJson">Export JSON</button>
+              <button class="btn ghost" id="btnExportMd">Export Markdown</button>
+              <button class="btn ghost" id="btnPrint">Print View</button>
+            </div>
+          </div>
+
+          <!-- Cadence -->
+          <div class="scene" id="sceneCadence">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(255,211,77,.95); box-shadow:0 0 0 6px rgba(255,211,77,.14)"></span><b>OPERATING CADENCE</b> <span class="small">— keep the system alive</span></div>
+
+              <p><b>Daily (3 minutes):</b></p>
+              <ul>
+                <li><b>Filter:</b> reduce friction / deepen meaning / strengthen system</li>
+                <li><b>Pick one:</b> one spine action, one story action, or one cleanup action</li>
+                <li><b>Seal:</b> a single sentence note for future you</li>
+              </ul>
+
+              <p><b>Weekly (30 minutes):</b></p>
+              <ul>
+                <li><b>One loop closed:</b> finish something that was open</li>
+                <li><b>One guardrail honored:</b> delete/decline one optional thing</li>
+                <li><b>One integration improved:</b> reduce a handoff step</li>
+              </ul>
+
+              <p><b>Monthly (60 minutes):</b></p>
+              <ul>
+                <li><b>Spine audit:</b> what’s fragile, what’s loud, what’s unclear</li>
+                <li><b>Priorities reset:</b> confirm P1 / P2 / P3 are still true</li>
+                <li><b>Visibility choice:</b> what (if anything) becomes public next</li>
+              </ul>
+
+              <div class="glowline"></div>
+              <p class="mono">Cadence rule: protect finishing energy. protect coherence. protect meaning.</p>
+            </div>
+
+            <div class="sep"></div>
+            <div class="row">
+              <button class="btn secondary" data-jump="sceneCapsule">Open Capsule →</button>
+              <button class="btn ghost" data-jump="sceneGuardrails">Back to Guardrails</button>
+            </div>
+          </div>
+
+          <!-- Capsule -->
+          <div class="scene" id="sceneCapsule">
+            <p class="title" style="margin:0 0 8px">EchoStory Capsule (Comprehensive)</p>
+            <p class="hint" style="margin:0 0 12px">
+              This capsule includes: Year Signals, Quarter alignment, Guardrails, Philosophy, Manifesto, 2026 Map, and Cadence.
+              Everything saves locally (localStorage). Export to JSON/Markdown for NXCore ingestion later.
+            </p>
+
+            <div class="meter" aria-label="Progress meter"><div id="bar"></div></div>
+            <div class="small" style="margin-top:8px" id="progressText">0% complete</div>
+
+            <div class="sep"></div>
+
+            <div class="checklist" id="checklist"></div>
+
+            <div class="sep"></div>
+
+            <div class="twoCol">
+              <div>
+                <label class="small"><b>Visibility mode</b></label>
+                <select id="visibilityMode">
+                  <option value="private">Private (internal)</option>
+                  <option value="selective">Selective (controlled exposure)</option>
+                  <option value="public">Public (publish-ready)</option>
+                </select>
+              </div>
+              <div>
+                <label class="small"><b>Primary focus this month</b></label>
+                <select id="focusMode">
+                  <option value="spine">Spine (stability + UX + docs)</option>
+                  <option value="integration">Integration (reduce steps)</option>
+                  <option value="story">Story (manifesto/output)</option>
+                  <option value="cleanup">Cleanup (delete/decline)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sep"></div>
+
+            <label class="small" for="notes"><b>Notes / decisions / wins</b></label>
+            <textarea id="notes" placeholder="Drop decisions, blockers, and the one sentence Future-You needs."></textarea>
+
+            <div class="row" style="margin-top:12px">
+              <button class="btn secondary" id="btnSave">Save</button>
+              <button class="btn ghost" id="btnCopyJson">Copy JSON</button>
+              <button class="btn ghost" id="btnCopyMd">Copy Markdown</button>
+              <button class="btn danger" id="btnReset">Reset</button>
+            </div>
+
+            <div class="footer">
+              <span class="badge" id="saveStamp">Last saved: —</span>
+              <span class="badge mono">Storage: local only</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RIGHT: Operator Console -->
+      <aside class="card asideOnly" aria-label="Controls and context">
+        <div class="hd">
+          <div>
+            <p class="title">Operator Console</p>
+            <p class="hint">Quick jumps + exports + optional ambience loader.</p>
+          </div>
+          <span class="badge">EchoVerse / AeroVista</span>
+        </div>
+
+        <div class="bd">
+          <p class="small"><b>Quick jumps</b></p>
+          <div class="row">
+            <button class="btn ghost" data-jump="sceneSignals">Signals</button>
+            <button class="btn ghost" data-jump="sceneQuarters">Quarters</button>
+            <button class="btn ghost" data-jump="sceneGuardrails">Guardrails</button>
+            <button class="btn ghost" data-jump="sceneMap">2026 Map</button>
+            <button class="btn ghost" data-jump="sceneCapsule">Capsule</button>
+          </div>
+
+          <div class="sep"></div>
+
+          <p class="small"><b>Ambience (optional)</b></p>
+          <input type="text" id="audioUrl" placeholder="Paste direct URL to mp3/wav..." />
+          <div class="row" style="margin-top:10px">
+            <button class="btn secondary" id="btnLoadAudio">Load</button>
+            <button class="btn ghost" id="btnStopAudio">Stop</button>
+          </div>
+
+          <div class="sep"></div>
+
+          <p class="small"><b>Mantra</b></p>
+          <input type="text" id="mantraInput" placeholder="Edit mantra..." />
+          <div class="row" style="margin-top:10px">
+            <button class="btn secondary" id="btnSetMantra">Set</button>
+            <button class="btn ghost" id="btnResetMantra">Reset</button>
+          </div>
+
+          <div class="sep"></div>
+
+          <p class="small"><b>Exports</b></p>
+          <div class="row">
+            <button class="btn ghost" id="btnSideExportJson">Export JSON</button>
+            <button class="btn ghost" id="btnSideExportMd">Export Markdown</button>
+            <button class="btn ghost" id="btnSidePrint">Print</button>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="quote" style="padding:12px">
+            <p style="margin:0 0 6px"><b>Decision filter</b></p>
+            <p class="mono" style="margin:0">reduce friction • deepen meaning • strengthen system</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Background FX ----------
+    (function spawnParticles(){
+      const bg = document.getElementById('bgfx');
+      const n = 46;
+      for(let i=0;i<n;i++){
+        const s = document.createElement('span');
+        const left = Math.random()*100;
+        const top = 100 + Math.random()*80;
+        const dur = 10 + Math.random()*18;
+        const delay = Math.random()*12;
+        const size = 1 + Math.random()*2;
+        s.style.left = left + 'vw';
+        s.style.top = top + 'vh';
+        s.style.width = size + 'px';
+        s.style.height = size + 'px';
+        s.style.animationDuration = dur + 's';
+        s.style.animationDelay = (-delay) + 's';
+        s.style.opacity = (0.25 + Math.random()*0.55).toFixed(2);
+        bg.appendChild(s);
+      }
+    })();
+
+    // ---------- Tabs / Scenes ----------
+    const tabs = [...document.querySelectorAll('.tab')];
+    const scenes = [...document.querySelectorAll('.scene')];
+
+    function showScene(id){
+      scenes.forEach(s => s.classList.toggle('active', s.id === id));
+      tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.scene === id ? 'true' : 'false'));
+      localStorage.setItem('echostory_scene', id);
+      const label = document.getElementById('modeLabel');
+      label.textContent = (id === 'sceneCapsule') ? 'Ops / Capsule' : 'Story Mode';
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => showScene(t.dataset.scene)));
+    document.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => showScene(b.dataset.jump)));
+
+    const savedScene = localStorage.getItem('echostory_scene');
+    if(savedScene && document.getElementById(savedScene)) showScene(savedScene);
+
+    // ---------- Audio ----------
+    const ambience = document.getElementById('ambience');
+    const audioStatus = document.getElementById('audioStatus');
+    const btnToggleAudio = document.getElementById('btnToggleAudio');
+
+    function setAudioStatus(on){
+      audioStatus.textContent = 'Ambience: ' + (on ? 'On' : 'Off');
+      btnToggleAudio.textContent = on ? 'Disable ambience' : 'Enable ambience';
+    }
+
+    btnToggleAudio.addEventListener('click', async ()=>{
+      if(ambience.paused){
+        try{
+          await ambience.play();
+          setAudioStatus(true);
+        }catch(e){
+          setAudioStatus(false);
+          alert('No ambience source loaded. Paste an audio URL in Operator Console, then Load.');
+        }
+      }else{
+        ambience.pause();
+        setAudioStatus(false);
+      }
+    });
+
+    document.getElementById('btnLoadAudio').addEventListener('click', async ()=>{
+      const url = document.getElementById('audioUrl').value.trim();
+      if(!url) return alert('Paste an audio URL first.');
+      ambience.innerHTML = '';
+      const src = document.createElement('source');
+      src.src = url;
+      src.type = url.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
+      ambience.appendChild(src);
+      try{
+        await ambience.load();
+        await ambience.play();
+        setAudioStatus(true);
+      }catch(e){
+        setAudioStatus(false);
+        alert('Could not play that URL. Make sure it is a direct link to an audio file.');
+      }
+    });
+
+    document.getElementById('btnStopAudio').addEventListener('click', ()=>{
+      ambience.pause();
+      ambience.currentTime = 0;
+      setAudioStatus(false);
+    });
+
+    // ---------- Mantra ----------
+    const MANTRA_KEY = 'echostory_mantra_v1';
+    const mantraPill = document.getElementById('mantraPill');
+    const mantraInput = document.getElementById('mantraInput');
+    const defaultMantra = "I build environments where good outcomes become the default.";
+
+    function loadMantra(){
+      const m = localStorage.getItem(MANTRA_KEY) || defaultMantra;
+      mantraPill.textContent = m;
+      mantraInput.value = m;
+    }
+    function saveMantra(m){
+      localStorage.setItem(MANTRA_KEY, m);
+      loadMantra();
+    }
+    document.getElementById('btnSetMantra').addEventListener('click', ()=>{
+      const m = mantraInput.value.trim() || defaultMantra;
+      saveMantra(m);
+    });
+    document.getElementById('btnResetMantra').addEventListener('click', ()=> saveMantra(defaultMantra));
+    loadMantra();
+
+    // ---------- Capsule Checklist + Storage ----------
+    const STORAGE_KEY = 'echostory_capsule_2026_comprehensive_v1';
+
+    const defaultChecklist = [
+      // Year Signals
+      { id:'sig_integrate', group:'Year Signals', label:'Integrated systems instead of accumulating tools', done:false },
+      { id:'sig_infra', group:'Year Signals', label:'Chose infrastructure over applause (durability over hype)', done:false },
+      { id:'sig_sharp', group:'Year Signals', label:'Creative voice sharpened (clarity over loud)', done:false },
+      { id:'sig_loops', group:'Year Signals', label:'Closed loops (finish over novelty)', done:false },
+      { id:'sig_align', group:'Year Signals', label:'Stayed aligned (meaning stayed central)', done:false },
+
+      // Quarter Reel
+      { id:'q1_noise', group:'Quarter Reel', label:'Q1: Cleared noise; reclaimed roadmap authority', done:false },
+      { id:'q2_struct', group:'Quarter Reel', label:'Q2: Built structural integrity; architect behavior', done:false },
+      { id:'q3_comp', group:'Quarter Reel', label:'Q3: Identity compression; subtraction as creation', done:false },
+      { id:'q4_conv', group:'Quarter Reel', label:'Q4: Convergence; tools support story + function', done:false },
+
+      // Guardrails
+      { id:'dd_integrate', group:'Guardrails', label:'Double down: Integration-first thinking', done:false },
+      { id:'dd_narrative', group:'Guardrails', label:'Double down: Narrative-backed systems (tools carry story)', done:false },
+      { id:'dd_finish', group:'Guardrails', label:'Double down: Finishing energy (close loops weekly)', done:false },
+      { id:'drop_rescue', group:'Guardrails', label:'Drop: Over-rescuing half-ideas', done:false },
+      { id:'drop_explain', group:'Guardrails', label:'Drop: Explaining before shipping', done:false },
+      { id:'drop_polish', group:'Guardrails', label:'Drop: Over-polishing before meaning', done:false },
+
+      // P1/P2/P3
+      { id:'p1_spine', group:'2026 P1', label:'P1: Harden the spine (stability + observability + UX + UI gaps)', done:false },
+      { id:'p1_cog', group:'2026 P1', label:'P1: Reduce cognitive load (defaults + fewer dashboards)', done:false },
+      { id:'p1_docs', group:'2026 P1', label:'P1: Finish quiet gaps (docs + onboarding + remove “I’ll remember”)', done:false },
+
+      { id:'p2_expose', group:'2026 P2', label:'P2: Selective exposure (controlled presence + friction truth)', done:false },
+      { id:'p2_create', group:'2026 P2', label:'P2: Creative output with purpose (fewer drops, stronger ties)', done:false },
+      { id:'p2_collab', group:'2026 P2', label:'P2: Light collaboration (plug-in ready, low risk)', done:false },
+
+      { id:'p3_money', group:'2026 P3', label:'P3: Monetization experiments (only if non-distorting)', done:false },
+      { id:'p3_new', group:'2026 P3', label:'P3: New projects only if infrastructure reuse (no new burden)', done:false },
+      { id:'p3_delight', group:'2026 P3', label:'P3: Delight layer after function (aesthetics later)', done:false },
+
+      // Cadence
+      { id:'cad_daily', group:'Cadence', label:'Daily: Apply filter + choose one meaningful action', done:false },
+      { id:'cad_weekly', group:'Cadence', label:'Weekly: Close one loop + honor one guardrail + improve one integration', done:false },
+      { id:'cad_monthly', group:'Cadence', label:'Monthly: Spine audit + priorities reset + visibility choice', done:false }
+    ];
+
+    function loadCapsule(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return { checklist: defaultChecklist, notes:'', savedAt:null, visibilityMode:'private', focusMode:'spine' };
+      try{
+        const parsed = JSON.parse(raw);
+        const byId = new Map((parsed.checklist||[]).map(i => [i.id, i.done]));
+        const merged = defaultChecklist.map(x => ({...x, done: !!byId.get(x.id)}));
+        return {
+          checklist: merged,
+          notes: parsed.notes || '',
+          savedAt: parsed.savedAt || null,
+          visibilityMode: parsed.visibilityMode || 'private',
+          focusMode: parsed.focusMode || 'spine'
+        };
+      }catch(e){
+        return { checklist: defaultChecklist, notes:'', savedAt:null, visibilityMode:'private', focusMode:'spine' };
+      }
+    }
+
+    function saveCapsule(state){
+      const payload = {
+        version: 'EV-CAPSULE-2026-COMPREHENSIVE-v1',
+        capsuleId: 'EV-CAPSULE-2026',
+        savedAt: new Date().toISOString(),
+        mantra: localStorage.getItem(MANTRA_KEY) || defaultMantra,
+        visibilityMode: state.visibilityMode,
+        focusMode: state.focusMode,
+        checklist: state.checklist.map(({id, done, group, label})=>({id, done, group, label})),
+        notes: state.notes || ''
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      return payload;
+    }
+
+    const checklistEl = document.getElementById('checklist');
+    const notesEl = document.getElementById('notes');
+    const bar = document.getElementById('bar');
+    const progressText = document.getElementById('progressText');
+    const saveStamp = document.getElementById('saveStamp');
+    const visibilityModeEl = document.getElementById('visibilityMode');
+    const focusModeEl = document.getElementById('focusMode');
+
+    let state = loadCapsule();
+    notesEl.value = state.notes;
+    visibilityModeEl.value = state.visibilityMode;
+    focusModeEl.value = state.focusMode;
+
+    function renderChecklist(){
+      checklistEl.innerHTML = '';
+      const groups = [...new Set(state.checklist.map(i=>i.group))];
+
+      groups.forEach(g=>{
+        const head = document.createElement('div');
+        head.className = 'small';
+        head.style.margin = '6px 0 2px';
+        head.innerHTML = `<b>${g}</b>`;
+        checklistEl.appendChild(head);
+
+        state.checklist.filter(i=>i.group===g).forEach(item=>{
+          const row = document.createElement('label');
+          row.className = 'item';
+          row.innerHTML = `
+            <input type="checkbox" ${item.done ? 'checked':''} />
+            <div class="lbl">${item.label}</div>
+          `;
+          const cb = row.querySelector('input');
+          cb.addEventListener('change', ()=>{
+            item.done = cb.checked;
+            updateProgress();
+            autosave();
+          });
+          checklistEl.appendChild(row);
+        });
+      });
+
+      updateProgress();
+      updateStamp();
+    }
+
+    function updateProgress(){
+      const total = state.checklist.length;
+      const done = state.checklist.filter(i=>i.done).length;
+      const pct = total ? Math.round((done/total)*100) : 0;
+      bar.style.width = pct + '%';
+      progressText.textContent = `${pct}% complete (${done}/${total})`;
+    }
+
+    function updateStamp(savedAt){
+      const iso = savedAt || state.savedAt;
+      saveStamp.textContent = 'Last saved: ' + (iso ? new Date(iso).toLocaleString() : '—');
+    }
+
+    function autosave(){
+      state.notes = notesEl.value;
+      state.visibilityMode = visibilityModeEl.value;
+      state.focusMode = focusModeEl.value;
+      const payload = saveCapsule(state);
+      state.savedAt = payload.savedAt;
+      updateStamp(payload.savedAt);
+    }
+
+    notesEl.addEventListener('input', ()=>{
+      window.clearTimeout(window.__evNoteTimer);
+      window.__evNoteTimer = window.setTimeout(()=> autosave(), 350);
+    });
+    visibilityModeEl.addEventListener('change', autosave);
+    focusModeEl.addEventListener('change', autosave);
+
+    document.getElementById('btnSave').addEventListener('click', ()=> autosave());
+
+    async function copyText(text){
+      try{ await navigator.clipboard.writeText(text); return true; }
+      catch(e){
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      }
+    }
+
+    function buildPayload(){
+      state.notes = notesEl.value;
+      state.visibilityMode = visibilityModeEl.value;
+      state.focusMode = focusModeEl.value;
+      return saveCapsule(state);
+    }
+
+    function payloadToMarkdown(payload){
+      const lines = [];
+      lines.push(`# EchoStory Capsule — ${payload.capsuleId}`);
+      lines.push(`- Saved: ${payload.savedAt}`);
+      lines.push(`- Visibility: ${payload.visibilityMode}`);
+      lines.push(`- Focus: ${payload.focusMode}`);
+      lines.push(`- Mantra: ${payload.mantra}`);
+      lines.push('');
+      const groups = {};
+      (payload.checklist||[]).forEach(i => {
+        groups[i.group] = groups[i.group] || [];
+        groups[i.group].push(i);
+      });
+      Object.keys(groups).forEach(g=>{
+        lines.push(`## ${g}`);
+        groups[g].forEach(i=>{
+          lines.push(`- ${i.done ? '[x]' : '[ ]'} ${i.label}`);
+        });
+        lines.push('');
+      });
+      lines.push(`## Notes`);
+      lines.push(payload.notes ? payload.notes : '_—_');
+      lines.push('');
+      return lines.join('\n');
+    }
+
+    document.getElementById('btnCopyJson').addEventListener('click', async ()=>{
+      const payload = buildPayload();
+      const ok = await copyText(JSON.stringify(payload, null, 2));
+      alert(ok ? 'Copied JSON.' : 'Copy failed.');
+    });
+
+    document.getElementById('btnCopyMd').addEventListener('click', async ()=>{
+      const payload = buildPayload();
+      const md = payloadToMarkdown(payload);
+      const ok = await copyText(md);
+      alert(ok ? 'Copied Markdown.' : 'Copy failed.');
+    });
+
+    document.getElementById('btnReset').addEventListener('click', ()=>{
+      if(!confirm('Reset capsule progress + notes?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = loadCapsule();
+      notesEl.value = state.notes;
+      visibilityModeEl.value = state.visibilityMode;
+      focusModeEl.value = state.focusMode;
+      renderChecklist();
+    });
+
+    function download(filename, content, type){
+      const blob = new Blob([content], {type});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 500);
+    }
+
+    // Map exports
+    document.getElementById('btnExportJson').addEventListener('click', ()=>{
+      const payload = buildPayload();
+      download('echostory_capsule_2026_comprehensive.json', JSON.stringify(payload, null, 2), 'application/json');
+    });
+
+    document.getElementById('btnExportMd').addEventListener('click', ()=>{
+      const payload = buildPayload();
+      const md = payloadToMarkdown(payload);
+      download('echostory_capsule_2026_comprehensive.md', md, 'text/markdown');
+    });
+
+    document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
+
+    // Side exports mirror
+    document.getElementById('btnSideExportJson').addEventListener('click', ()=> document.getElementById('btnExportJson').click());
+    document.getElementById('btnSideExportMd').addEventListener('click', ()=> document.getElementById('btnExportMd').click());
+    document.getElementById('btnSidePrint').addEventListener('click', ()=> document.getElementById('btnPrint').click());
+
+    // Print button at map scene (some browsers need it separate)
+    document.getElementById('btnSidePrint').addEventListener('click', ()=> window.print());
+
+    // Scene Map extra hooks
+    document.getElementById('btnSidePrint').addEventListener('click', ()=> window.print());
+    document.getElementById('btnSideExportJson').addEventListener('click', ()=> document.getElementById('btnExportJson').click());
+    document.getElementById('btnSideExportMd').addEventListener('click', ()=> document.getElementById('btnExportMd').click());
+
+    // Simple top map buttons
+    document.getElementById('btnSidePrint').addEventListener('click', ()=> window.print());
+
+    // Operator console exports
+    document.getElementById('btnSideExportJson').addEventListener('click', ()=> document.getElementById('btnExportJson').click());
+    document.getElementById('btnSideExportMd').addEventListener('click', ()=> document.getElementById('btnExportMd').click());
+    document.getElementById('btnSidePrint').addEventListener('click', ()=> window.print());
+
+    // Additional duplicates (safe no-op)
+    document.getElementById('btnSidePrint').addEventListener('click', ()=> window.print());
+
+    // Operator console exports
+    document.getElementById('btnSideExportJson').addEventListener('click', ()=> document.getElementById('btnExportJson').click());
+    document.getElementById('btnSideExportMd').addEventListener('click', ()=> document.getElementById('btnExportMd').click());
+    document.getElementById('btnSidePrint').addEventListener('click', ()=> window.print());
+
+    // Reset duplicates trimmed by browser
+
+    // Other: map scene export buttons exist only there
+    document.getElementById('btnSidePrint').addEventListener('click', ()=> window.print());
+
+    // Export buttons in map scene
+    document.getElementById('btnSideExportJson').addEventListener('click', ()=> document.getElementById('btnExportJson').click());
+    document.getElementById('btnSideExportMd').addEventListener('click', ()=> document.getElementById('btnExportMd').click());
+
+    // Basic render
+    renderChecklist();
+
+    // ---------- Capsule Metadata ----------
+    const capsuleMeta = {
+      type: "echostory",
+      title: "The Year the System Woke Up (Comprehensive)",
+      capsuleId: "EV-CAPSULE-2026",
+      createdLocal: new Date().toISOString(),
+      contains: ["year_signals","quarters","guardrails","philosophy","manifesto","priorities","cadence","checklist","notes"],
+      storageKey: STORAGE_KEY
+    };
+    document.getElementById('capsuleId').textContent = capsuleMeta.capsuleId;
+    document.documentElement.dataset.echostoryCapsule = JSON.stringify(capsuleMeta);
+
+    // ---------- Small cleanup: map print/export buttons ----------
+    document.getElementById('btnSidePrint').onclick = ()=>window.print();
+    document.getElementById('btnSideExportJson').onclick = ()=>document.getElementById('btnExportJson').click();
+    document.getElementById('btnSideExportMd').onclick = ()=>document.getElementById('btnExportMd').click();
+  </script>
+</body>
+</html>

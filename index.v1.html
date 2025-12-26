@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EchoStory — The Year the System Woke Up</title>
+  <meta name="theme-color" content="#0b0f14" />
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#0f1620; --panel2:#0c121a;
+      --txt:#e7f0ff; --muted:#9fb3cc;
+      --a:#7c5cff; --b:#27e0ff; --g:#2cff8f; --y:#ffd34d; --r:#ff4d6d;
+      --br:18px; --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --stroke: rgba(255,255,255,.08);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:var(--sans); color:var(--txt); background:radial-gradient(1200px 800px at 20% -10%, rgba(124,92,255,.22), transparent 60%),
+      radial-gradient(900px 700px at 90% 10%, rgba(39,224,255,.14), transparent 55%),
+      radial-gradient(800px 650px at 30% 90%, rgba(44,255,143,.10), transparent 60%),
+      linear-gradient(180deg, #070a0f, var(--bg));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:28px 16px 64px;}
+    .top{
+      display:flex; gap:14px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; gap:12px; align-items:center;
+    }
+    .sig{
+      width:44px; height:44px; border-radius:14px;
+      background: conic-gradient(from 180deg, rgba(124,92,255,.95), rgba(39,224,255,.85), rgba(44,255,143,.85), rgba(255,211,77,.85), rgba(255,77,109,.85), rgba(124,92,255,.95));
+      box-shadow: 0 10px 40px rgba(124,92,255,.22);
+      position:relative;
+    }
+    .sig:after{
+      content:""; position:absolute; inset:2px; border-radius:12px;
+      background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.2));
+      border:1px solid rgba(255,255,255,.08);
+    }
+    h1{margin:0; font-size:20px; letter-spacing:.2px}
+    .sub{color:var(--muted); font-size:13px; margin-top:2px}
+    .pillbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .pill{
+      padding:9px 12px; border-radius:999px; background:rgba(255,255,255,.05);
+      border:1px solid var(--stroke);
+      color:var(--muted); font-size:12px; display:flex; gap:8px; align-items:center;
+      backdrop-filter: blur(10px);
+    }
+    .pill strong{color:var(--txt); font-weight:650}
+    .grid{
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:16px; margin-top:16px;
+    }
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--stroke);
+      border-radius:var(--br);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:16px 16px 12px;
+      background:linear-gradient(180deg, rgba(0,0,0,.25), transparent);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .title{font-size:14px; font-weight:750; margin:0}
+    .hint{font-size:12px; color:var(--muted); margin-top:6px; line-height:1.35}
+    .bd{padding:14px 16px 16px}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      padding:10px 12px; border-radius:12px;
+      background:rgba(124,92,255,.15);
+      color:var(--txt); font-weight:700; font-size:13px;
+      border:1px solid rgba(124,92,255,.35);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .btn:hover{transform:translateY(-1px); background:rgba(124,92,255,.2); border-color:rgba(124,92,255,.55)}
+    .btn.secondary{background:rgba(39,224,255,.10); border-color:rgba(39,224,255,.35)}
+    .btn.ghost{background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12); color:var(--muted); font-weight:650}
+    .btn.danger{background:rgba(255,77,109,.12); border-color:rgba(255,77,109,.35)}
+    .sep{height:1px; background:rgba(255,255,255,.08); margin:12px 0}
+    .tabs{display:flex; gap:8px; flex-wrap:wrap}
+    .tab{
+      padding:9px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04); color:var(--muted); font-weight:650; font-size:12px;
+      cursor:pointer; user-select:none;
+    }
+    .tab[aria-selected="true"]{
+      color:var(--txt);
+      border-color:rgba(39,224,255,.42);
+      background:rgba(39,224,255,.10);
+    }
+    .scene{
+      display:none;
+      animation: fadeIn .22s ease both;
+    }
+    .scene.active{display:block}
+    @keyframes fadeIn{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:none}}
+    .quote{
+      padding:14px 14px;
+      border-radius:14px;
+      background:linear-gradient(180deg, rgba(12,18,26,.75), rgba(12,18,26,.35));
+      border:1px solid rgba(255,255,255,.10);
+      line-height:1.55;
+      position:relative;
+      overflow:hidden;
+    }
+    .quote:before{
+      content:""; position:absolute; inset:-80px;
+      background:radial-gradient(360px 180px at 15% 30%, rgba(39,224,255,.18), transparent 60%),
+                 radial-gradient(340px 160px at 80% 70%, rgba(124,92,255,.16), transparent 62%);
+      filter: blur(0px);
+      opacity:.9;
+    }
+    .quote > *{position:relative}
+    .mono{font-family:var(--mono); font-size:12px; color:rgba(231,240,255,.78)}
+    .kicker{
+      font-size:12px; color:rgba(231,240,255,.85);
+      display:flex; gap:8px; align-items:center;
+      margin-bottom:8px;
+    }
+    .dot{width:8px; height:8px; border-radius:99px; background:rgba(44,255,143,.9); box-shadow: 0 0 0 6px rgba(44,255,143,.12)}
+    .checklist{display:grid; gap:8px}
+    .item{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 10px; border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .item input{margin-top:3px; transform:scale(1.1)}
+    .item .lbl{font-size:13px; line-height:1.35}
+    .item .lbl b{font-weight:800}
+    .small{font-size:12px; color:var(--muted)}
+    .meter{
+      height:10px; border-radius:999px; background:rgba(255,255,255,.08);
+      overflow:hidden; border:1px solid rgba(255,255,255,.10);
+    }
+    .meter > div{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, rgba(39,224,255,.9), rgba(124,92,255,.9), rgba(44,255,143,.9));
+      transition: width .25s ease;
+    }
+    textarea, input[type="text"]{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--txt);
+      outline:none;
+      font-size:13px;
+    }
+    textarea{min-height:120px; resize:vertical}
+    .footer{
+      margin-top:16px; color:var(--muted); font-size:12px; line-height:1.45;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .badge{
+      font-family:var(--mono);
+      font-size:11px;
+      color:rgba(231,240,255,.75);
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      padding:6px 10px;
+      border-radius:999px;
+    }
+    .glowline{
+      height:1px; background:linear-gradient(90deg, transparent, rgba(39,224,255,.25), rgba(124,92,255,.25), rgba(44,255,143,.18), transparent);
+      margin:16px 0;
+    }
+
+    /* subtle animated particles */
+    .bgfx{
+      pointer-events:none;
+      position:fixed; inset:0;
+      opacity:.55;
+      mix-blend-mode:screen;
+      filter: blur(.2px);
+    }
+    .bgfx span{
+      position:absolute; width:2px; height:2px; border-radius:999px;
+      background:rgba(39,224,255,.9);
+      animation: drift linear infinite;
+      opacity:.65;
+    }
+    @keyframes drift{
+      from{transform:translate3d(0,0,0); opacity:.0}
+      15%{opacity:.7}
+      85%{opacity:.7}
+      to{transform:translate3d(0,-120vh,0); opacity:0}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bgfx" id="bgfx" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="sig" aria-hidden="true"></div>
+        <div>
+          <h1>EchoStory — <span style="color:rgba(39,224,255,.95)">The Year the System Woke Up</span></h1>
+          <div class="sub">A living narrative capsule: philosophy → manifesto → priorities (2026).</div>
+        </div>
+      </div>
+      <div class="pillbar">
+        <div class="pill"><span>🧠</span><strong id="modeLabel">Story Mode</strong></div>
+        <div class="pill"><span>💾</span><span>Autosave:</span><strong>On</strong></div>
+        <div class="pill"><span>⚙️</span><span class="mono" id="capsuleId">EV-CAPSULE-2026</span></div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Story + Tabs -->
+      <section class="card" aria-label="EchoStory narrative">
+        <div class="hd">
+          <div>
+            <p class="title">Scenes</p>
+            <p class="hint">Tap a scene. This EchoStory is written like a system log: human meaning, engineered structure, zero fluff.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Scene tabs">
+            <button class="tab" role="tab" aria-selected="true" data-scene="scene0">Prologue</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="scene1">Philosophy</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="scene2">Manifesto</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="scene3">2026 Map</button>
+            <button class="tab" role="tab" aria-selected="false" data-scene="scene4">Capsule</button>
+          </div>
+        </div>
+
+        <div class="bd">
+          <!-- Scene 0 -->
+          <div class="scene active" id="scene0">
+            <div class="quote">
+              <div class="kicker"><span class="dot"></span><b>PROLOGUE</b> <span class="small">— the year you stopped proving and started building inevitability</span></div>
+              <p>
+                There was a time when every new idea felt like a flare in the sky:
+                bright, loud, and gone before anyone could read the message.
+              </p>
+              <p>
+                This year didn’t chase flares.
+                This year forged a <b>spine</b>.
+              </p>
+              <p>
+                The system didn’t become bigger.
+                It became <b>coherent</b>.
+                The tools started to talk.
+                The story started to function.
+                The noise got turned into signal.
+              </p>
+              <div class="glowline"></div>
+              <p class="mono">
+                LOG: Integrity increased. Friction reduced. Identity compressed. Convergence achieved.
+              </p>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="row">
+              <button class="btn" id="btnNextFromPrologue">Continue →</button>
+              <button class="btn ghost" id="btnToggleAudio">Enable ambience</button>
+              <span class="small" id="audioStatus">Ambience: Off</span>
+            </div>
+
+            <audio id="ambience" loop preload="none">
+              <!-- Optional: drop your own ambient mp3/wav path here -->
+              <!-- <source src="media/echostory_ambience.mp3" type="audio/mpeg" /> -->
+            </audio>
+          </div>
+
+          <!-- Scene 1 -->
+          <div class="scene" id="scene1">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(39,224,255,.95); box-shadow:0 0 0 6px rgba(39,224,255,.14)"></span><b>PERSONAL OPERATING PHILOSOPHY</b></div>
+              <p><b>Core premise:</b> I operate as a system steward, not a task executor.</p>
+              <p><b>Rule 1 — Integration beats accumulation.</b> If it doesn’t connect, it doesn’t belong.</p>
+              <p><b>Rule 2 — Meaning precedes optimization.</b> I do not polish confusion.</p>
+              <p><b>Rule 3 — Infrastructure is care.</b> Good systems respect future users — including future me.</p>
+              <p><b>Rule 4 — Subtraction is creation.</b> Removing the wrong thing is as valuable as building the right one.</p>
+              <p><b>Rule 5 — Long arcs over loud moments.</b> Durability over applause.</p>
+              <p><b>Rule 6 — Trust decisions once made.</b> Re-litigating is disguised fear.</p>
+              <div class="glowline"></div>
+              <p class="mono"><b>Daily filter:</b> Does this reduce friction, deepen meaning, or strengthen the system?</p>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="row">
+              <button class="btn secondary" data-jump="scene2">Go to Manifesto →</button>
+              <button class="btn ghost" data-jump="scene4">Jump to Capsule →</button>
+            </div>
+          </div>
+
+          <!-- Scene 2 -->
+          <div class="scene" id="scene2">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(124,92,255,.95); box-shadow:0 0 0 6px rgba(124,92,255,.14)"></span><b>FOUNDER LETTER / MANIFESTO</b></div>
+              <p>
+                I didn’t start this to chase trends. I started it because systems were broken —
+                and people were expected to adapt instead of being supported.
+              </p>
+              <p>
+                We build tools that carry story. We tell stories that function.
+              </p>
+              <p>
+                We don’t ship noise. We ship clarity.
+                We don’t build for everyone. We build for those who notice.
+              </p>
+              <p>
+                If you’re here, it’s because something resonated — not because we explained it well enough.
+                That’s intentional.
+              </p>
+              <div class="glowline"></div>
+              <p class="mono">— Founder</p>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="row">
+              <button class="btn secondary" data-jump="scene3">Open 2026 Map →</button>
+              <button class="btn ghost" data-jump="scene1">Back to Philosophy</button>
+            </div>
+          </div>
+
+          <!-- Scene 3 -->
+          <div class="scene" id="scene3">
+            <div class="quote">
+              <div class="kicker"><span class="dot" style="background:rgba(44,255,143,.95); box-shadow:0 0 0 6px rgba(44,255,143,.14)"></span><b>2026 PRIORITIES</b> <span class="small">— P1 / P2 / P3</span></div>
+
+              <p><b>P1 (Non-Negotiables):</b></p>
+              <ul>
+                <li><b>Harden the spine:</b> NXCore stability + observability; AeroCoreOS UX; EchoVerse UI integration for ready backend.</li>
+                <li><b>Reduce cognitive load:</b> fewer dashboards, stronger defaults; one source of truth per system.</li>
+                <li><b>Finish quiet gaps:</b> documentation completeness; onboarding clarity; remove “I’ll remember” dependencies.</li>
+              </ul>
+
+              <p><b>P2 (Expansion with discipline):</b></p>
+              <ul>
+                <li><b>Selective exposure:</b> controlled public presence; observe friction honestly.</li>
+                <li><b>Creative output with purpose:</b> fewer releases; stronger narrative ties; no “just because” drops.</li>
+                <li><b>Light collaboration:</b> plug-in ready; low-risk; no rewrites for others yet.</li>
+              </ul>
+
+              <p><b>P3 (Optional):</b></p>
+              <ul>
+                <li><b>Monetization experiments:</b> only if they don’t distort the system.</li>
+                <li><b>New projects:</b> only if they reuse existing infrastructure with no net-new maintenance burden.</li>
+                <li><b>Delight layer:</b> aesthetics/animations after function is complete.</li>
+              </ul>
+
+              <div class="glowline"></div>
+              <p class="mono">End state: other people can enter the ecosystem and understand it without you present.</p>
+            </div>
+
+            <div class="sep"></div>
+
+            <div class="row">
+              <button class="btn" data-jump="scene4">Seal into Capsule →</button>
+              <button class="btn ghost" id="btnExport">Export JSON</button>
+            </div>
+          </div>
+
+          <!-- Scene 4 -->
+          <div class="scene" id="scene4">
+            <p class="title" style="margin:0 0 8px">EchoStory Capsule</p>
+            <p class="hint" style="margin:0 0 12px">
+              Use this like an EOD capsule: check items, add notes, export a portable JSON.
+              Everything saves locally in your browser (localStorage).
+            </p>
+
+            <div class="meter" aria-label="Progress meter"><div id="bar"></div></div>
+            <div class="small" style="margin-top:8px" id="progressText">0% complete</div>
+
+            <div class="sep"></div>
+
+            <div class="checklist" id="checklist">
+              <!-- populated by JS -->
+            </div>
+
+            <div class="sep"></div>
+
+            <label class="small" for="notes"><b>Notes / add context (optional)</b></label>
+            <textarea id="notes" placeholder="Drop decisions, blockers, wins, or a single sentence you want Future-You to read."></textarea>
+
+            <div class="row" style="margin-top:12px">
+              <button class="btn secondary" id="btnSave">Save</button>
+              <button class="btn ghost" id="btnCopy">Copy Capsule JSON</button>
+              <button class="btn danger" id="btnReset">Reset</button>
+            </div>
+
+            <div class="footer">
+              <span class="badge" id="saveStamp">Last saved: —</span>
+              <span class="badge mono">Storage: local only</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- RIGHT: Quick Controls -->
+      <aside class="card" aria-label="Controls and context">
+        <div class="hd">
+          <div>
+            <p class="title">Operator Console</p>
+            <p class="hint">Fast toggles + quick actions. This is the “system steward” cockpit.</p>
+          </div>
+          <span class="badge">EchoVerse / AeroVista</span>
+        </div>
+
+        <div class="bd">
+          <p class="small"><b>Mode</b></p>
+          <div class="row">
+            <button class="btn" id="btnStory">Story Mode</button>
+            <button class="btn secondary" id="btnOps">Ops Mode</button>
+          </div>
+          <div class="sep"></div>
+
+          <p class="small"><b>Quick jumps</b></p>
+          <div class="row">
+            <button class="btn ghost" data-jump="scene1">Philosophy</button>
+            <button class="btn ghost" data-jump="scene2">Manifesto</button>
+            <button class="btn ghost" data-jump="scene3">2026 Map</button>
+            <button class="btn ghost" data-jump="scene4">Capsule</button>
+          </div>
+
+          <div class="sep"></div>
+
+          <p class="small"><b>Inject your own audio (optional)</b></p>
+          <input type="text" id="audioUrl" placeholder="Paste a direct URL to ambience audio (mp3/wav)..." />
+          <div class="row" style="margin-top:10px">
+            <button class="btn secondary" id="btnLoadAudio">Load</button>
+            <button class="btn ghost" id="btnStopAudio">Stop</button>
+          </div>
+          <p class="hint" style="margin-top:10px">
+            Tip: if you host a file on NXCore, paste that URL here and the EchoStory gains atmosphere instantly.
+          </p>
+
+          <div class="sep"></div>
+
+          <p class="small"><b>Micro-ritual</b></p>
+          <div class="quote" style="padding:12px">
+            <p style="margin:0 0 6px"><b>One sentence to steer 2026:</b></p>
+            <p class="mono" style="margin:0">
+              “I build environments where good outcomes become the default.”
+            </p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Background FX ----------
+    (function spawnParticles(){
+      const bg = document.getElementById('bgfx');
+      const n = 46;
+      for(let i=0;i<n;i++){
+        const s = document.createElement('span');
+        const left = Math.random()*100;
+        const top = 100 + Math.random()*80;
+        const dur = 10 + Math.random()*18;
+        const delay = Math.random()*12;
+        const size = 1 + Math.random()*2;
+        s.style.left = left + 'vw';
+        s.style.top = top + 'vh';
+        s.style.width = size + 'px';
+        s.style.height = size + 'px';
+        s.style.animationDuration = dur + 's';
+        s.style.animationDelay = (-delay) + 's';
+        s.style.opacity = (0.25 + Math.random()*0.55).toFixed(2);
+        bg.appendChild(s);
+      }
+    })();
+
+    // ---------- Tabs / Scenes ----------
+    const tabs = [...document.querySelectorAll('.tab')];
+    const scenes = [...document.querySelectorAll('.scene')];
+
+    function showScene(id){
+      scenes.forEach(s => s.classList.toggle('active', s.id === id));
+      tabs.forEach(t => t.setAttribute('aria-selected', t.dataset.scene === id ? 'true' : 'false'));
+      localStorage.setItem('echostory_scene', id);
+      // update mode label based on selection
+      const label = document.getElementById('modeLabel');
+      if(id === 'scene4') label.textContent = 'Ops / Capsule';
+      else label.textContent = 'Story Mode';
+    }
+
+    tabs.forEach(t => t.addEventListener('click', () => showScene(t.dataset.scene)));
+    document.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => showScene(b.dataset.jump)));
+
+    const savedScene = localStorage.getItem('echostory_scene');
+    if(savedScene && document.getElementById(savedScene)) showScene(savedScene);
+
+    document.getElementById('btnNextFromPrologue').addEventListener('click', ()=> showScene('scene1'));
+
+    // ---------- Mode buttons ----------
+    document.getElementById('btnStory').addEventListener('click', ()=> showScene('scene0'));
+    document.getElementById('btnOps').addEventListener('click', ()=> showScene('scene4'));
+
+    // ---------- Audio ----------
+    const ambience = document.getElementById('ambience');
+    const audioStatus = document.getElementById('audioStatus');
+    const btnToggleAudio = document.getElementById('btnToggleAudio');
+
+    function setAudioStatus(on){
+      audioStatus.textContent = 'Ambience: ' + (on ? 'On' : 'Off');
+      btnToggleAudio.textContent = on ? 'Disable ambience' : 'Enable ambience';
+    }
+
+    btnToggleAudio.addEventListener('click', async ()=>{
+      if(ambience.paused){
+        try{
+          await ambience.play();
+          setAudioStatus(true);
+        }catch(e){
+          setAudioStatus(false);
+          alert('No ambience source loaded. Paste an audio URL in Operator Console, then Load.');
+        }
+      }else{
+        ambience.pause();
+        setAudioStatus(false);
+      }
+    });
+
+    document.getElementById('btnLoadAudio').addEventListener('click', async ()=>{
+      const url = document.getElementById('audioUrl').value.trim();
+      if(!url) return alert('Paste an audio URL first.');
+      ambience.innerHTML = '';
+      const src = document.createElement('source');
+      src.src = url;
+      src.type = url.endsWith('.wav') ? 'audio/wav' : 'audio/mpeg';
+      ambience.appendChild(src);
+      try{
+        await ambience.load();
+        await ambience.play();
+        setAudioStatus(true);
+      }catch(e){
+        setAudioStatus(false);
+        alert('Could not play that URL. Make sure it is a direct link to an audio file.');
+      }
+    });
+
+    document.getElementById('btnStopAudio').addEventListener('click', ()=>{
+      ambience.pause();
+      ambience.currentTime = 0;
+      setAudioStatus(false);
+    });
+
+    // ---------- Capsule Checklist ----------
+    const STORAGE_KEY = 'echostory_capsule_2026_v1';
+    const defaultChecklist = [
+      { id:'p1_spine',  label:'P1 — Harden the spine (NXCore/AeroCoreOS/EchoVerse UI gaps)', group:'P1' },
+      { id:'p1_cog',    label:'P1 — Reduce cognitive load (fewer dashboards, stronger defaults)', group:'P1' },
+      { id:'p1_docs',   label:'P1 — Finish quiet gaps (docs + onboarding + remove “I’ll remember”)', group:'P1' },
+      { id:'p2_expose', label:'P2 — Selective exposure (controlled presence + honest friction)', group:'P2' },
+      { id:'p2_create', label:'P2 — Creative output with purpose (fewer drops, stronger ties)', group:'P2' },
+      { id:'p2_collab', label:'P2 — Light collaboration (plug-in ready, low risk)', group:'P2' },
+      { id:'p3_money',  label:'P3 — Monetization experiments (only if non-distorting)', group:'P3' },
+      { id:'p3_new',    label:'P3 — New projects only if they reuse infrastructure', group:'P3' },
+      { id:'p3_delight',label:'P3 — Delight layer after function (aesthetics/animations)', group:'P3' },
+    ];
+
+    function loadCapsule(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return { checklist: defaultChecklist.map(x=>({...x, done:false})), notes:'', savedAt:null };
+      try{
+        const parsed = JSON.parse(raw);
+        const byId = new Map((parsed.checklist||[]).map(i => [i.id, i.done]));
+        const merged = defaultChecklist.map(x => ({...x, done: !!byId.get(x.id)}));
+        return { checklist: merged, notes: parsed.notes || '', savedAt: parsed.savedAt || null };
+      }catch(e){
+        return { checklist: defaultChecklist.map(x=>({...x, done:false})), notes:'', savedAt:null };
+      }
+    }
+
+    function saveCapsule(state){
+      const payload = {
+        version: 'EV-CAPSULE-2026-v1',
+        capsuleId: 'EV-CAPSULE-2026',
+        savedAt: new Date().toISOString(),
+        checklist: state.checklist.map(({id, done, group, label})=>({id, done, group, label})),
+        notes: state.notes || ''
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      return payload;
+    }
+
+    const checklistEl = document.getElementById('checklist');
+    const notesEl = document.getElementById('notes');
+    const bar = document.getElementById('bar');
+    const progressText = document.getElementById('progressText');
+    const saveStamp = document.getElementById('saveStamp');
+
+    let state = loadCapsule();
+    notesEl.value = state.notes;
+
+    function renderChecklist(){
+      checklistEl.innerHTML = '';
+      const groups = ['P1','P2','P3'];
+
+      groups.forEach(g=>{
+        const head = document.createElement('div');
+        head.className = 'small';
+        head.style.margin = '6px 0 2px';
+        head.innerHTML = `<b>${g}</b>`;
+        checklistEl.appendChild(head);
+
+        state.checklist.filter(i=>i.group===g).forEach(item=>{
+          const row = document.createElement('label');
+          row.className = 'item';
+          row.innerHTML = `
+            <input type="checkbox" ${item.done ? 'checked':''} />
+            <div class="lbl"><b>${item.label.split('—')[0].trim()}</b> — ${item.label.split('—').slice(1).join('—').trim()}</div>
+          `;
+          const cb = row.querySelector('input');
+          cb.addEventListener('change', ()=>{
+            item.done = cb.checked;
+            updateProgress();
+            autosave();
+          });
+          checklistEl.appendChild(row);
+        });
+      });
+
+      updateProgress();
+      updateStamp();
+    }
+
+    function updateProgress(){
+      const total = state.checklist.length;
+      const done = state.checklist.filter(i=>i.done).length;
+      const pct = total ? Math.round((done/total)*100) : 0;
+      bar.style.width = pct + '%';
+      progressText.textContent = `${pct}% complete (${done}/${total})`;
+    }
+
+    function updateStamp(savedAt){
+      const iso = savedAt || state.savedAt;
+      saveStamp.textContent = 'Last saved: ' + (iso ? new Date(iso).toLocaleString() : '—');
+    }
+
+    function autosave(){
+      state.notes = notesEl.value;
+      const payload = saveCapsule(state);
+      state.savedAt = payload.savedAt;
+      updateStamp(payload.savedAt);
+    }
+
+    notesEl.addEventListener('input', ()=>{
+      // lightweight debounce
+      window.clearTimeout(window.__evNoteTimer);
+      window.__evNoteTimer = window.setTimeout(()=> autosave(), 350);
+    });
+
+    document.getElementById('btnSave').addEventListener('click', ()=> autosave());
+
+    async function copyText(text){
+      try{
+        await navigator.clipboard.writeText(text);
+        return true;
+      }catch(e){
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      }
+    }
+
+    document.getElementById('btnCopy').addEventListener('click', async ()=>{
+      state.notes = notesEl.value;
+      const payload = saveCapsule(state);
+      const ok = await copyText(JSON.stringify(payload, null, 2));
+      alert(ok ? 'Capsule JSON copied.' : 'Copy failed.');
+    });
+
+    document.getElementById('btnReset').addEventListener('click', ()=>{
+      if(!confirm('Reset capsule progress + notes?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = loadCapsule();
+      notesEl.value = state.notes;
+      renderChecklist();
+    });
+
+    document.getElementById('btnExport').addEventListener('click', async ()=>{
+      state.notes = notesEl.value;
+      const payload = saveCapsule(state);
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'echostory_capsule_2026.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 500);
+    });
+
+    // initial render
+    renderChecklist();
+
+    // ---------- Capsule Metadata Embed (for other tools) ----------
+    // You can scrape this JSON from the DOM if you want to ingest into NXCore later.
+    const capsuleMeta = {
+      type: "echostory",
+      title: "The Year the System Woke Up",
+      capsuleId: "EV-CAPSULE-2026",
+      createdLocal: new Date().toISOString(),
+      contains: ["philosophy","manifesto","priorities","checklist","notes"],
+      storageKey: STORAGE_KEY
+    };
+    document.getElementById('capsuleId').textContent = capsuleMeta.capsuleId;
+    document.documentElement.dataset.echostoryCapsule = JSON.stringify(capsuleMeta);
+
+  </script>
+</body>
+</html>

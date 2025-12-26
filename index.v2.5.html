@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>EchoStory — COHERENCE BY DEFAULT (Playlist + Booklet)</title>
+  <meta name="theme-color" content="#0b0f14" />
+  <style>
+    :root{
+      --bg:#0b0f14; --txt:#e7f0ff; --muted:#9fb3cc;
+      --stroke:rgba(255,255,255,.10);
+      --a:#7c5cff; --b:#27e0ff; --g:#2cff8f; --y:#ffd34d; --r:#ff4d6d;
+      --br:18px; --shadow:0 20px 60px rgba(0,0,0,.45);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--txt); font-family:var(--sans);
+      background:
+        radial-gradient(1200px 800px at 20% -10%, rgba(124,92,255,.22), transparent 60%),
+        radial-gradient(900px 700px at 90% 10%, rgba(39,224,255,.14), transparent 55%),
+        radial-gradient(800px 650px at 30% 90%, rgba(44,255,143,.10), transparent 60%),
+        linear-gradient(180deg, #070a0f, var(--bg));
+      min-height:100vh; overflow-x:hidden;
+    }
+    .wrap{max-width:1200px; margin:0 auto; padding:22px 14px 46px;}
+    .hero{display:flex; gap:14px; align-items:center; margin-bottom:14px; flex-wrap:wrap;}
+    .sigil{
+      width:52px; height:52px; border-radius:16px; flex:0 0 auto; position:relative;
+      background: conic-gradient(from 180deg, rgba(124,92,255,.95), rgba(39,224,255,.85), rgba(44,255,143,.85), rgba(255,211,77,.85), rgba(255,77,109,.85), rgba(124,92,255,.95));
+      box-shadow: 0 10px 40px rgba(124,92,255,.22);
+    }
+    .sigil:after{content:""; position:absolute; inset:2px; border-radius:14px; background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.15)); border:1px solid var(--stroke);}
+    h1{margin:0; font-size:18px; letter-spacing:.2px}
+    h1 span{color:rgba(39,224,255,.95)}
+    .sub{margin:6px 0 0; color:var(--muted); font-size:13px; line-height:1.35}
+    .badges{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .badge{
+      font-size:11px; padding:6px 10px; border-radius:999px;
+      background:rgba(255,255,255,.05); border:1px solid var(--stroke); color:rgba(231,240,255,.8);
+    }
+
+    .grid{display:grid; grid-template-columns: 1.25fr .75fr; gap:14px;}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--stroke);
+      border-radius:var(--br);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+    .head{
+      padding:14px 14px 12px;
+      background:linear-gradient(180deg, rgba(0,0,0,.25), transparent);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .title{font-size:14px; font-weight:850}
+    .hint{font-size:12px; color:var(--muted); margin-top:4px; line-height:1.3}
+    .mini{display:flex; gap:8px; flex-wrap:wrap}
+
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      padding:10px 12px; border-radius:12px;
+      background:rgba(124,92,255,.15);
+      color:var(--txt); font-weight:800; font-size:13px;
+      border:1px solid rgba(124,92,255,.35);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .btn:hover{transform:translateY(-1px); background:rgba(124,92,255,.20); border-color:rgba(124,92,255,.55)}
+    .btn.primary{background:rgba(39,224,255,.14); border-color:rgba(39,224,255,.40)}
+    .btn.ghost{background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.14); color:rgba(231,240,255,.78); font-weight:700}
+    .btn.danger{background:rgba(255,77,109,.12); border-color:rgba(255,77,109,.35)}
+
+    .body{padding:12px 14px 14px}
+    .divider{height:1px; background:linear-gradient(90deg, transparent, rgba(39,224,255,.25), rgba(124,92,255,.25), rgba(44,255,143,.18), transparent);}
+
+    .nowLine1{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .letter{
+      font-family:var(--mono); font-size:12px; padding:4px 8px; border-radius:999px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+    }
+    .trackName{font-size:16px; font-weight:900; letter-spacing:.2px}
+    .nowLine2{display:flex; gap:8px; align-items:center; color:var(--muted); font-size:12px; margin-top:5px; flex-wrap:wrap}
+    .dot{opacity:.7}
+    .small{font-size:12px; color:var(--muted)}
+    .mono{font-family:var(--mono)}
+
+    .progress{margin-top:12px}
+    input[type="range"]{width:100%}
+    .progressMeta{display:flex; justify-content:space-between; margin-top:6px}
+
+    .controls{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .controlsLeft{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .controlsRight{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .vol{display:flex; gap:8px; align-items:center}
+    .vol input[type="range"]{width:140px}
+    @media (max-width:560px){ .vol input[type="range"]{width:120px} }
+
+    .version{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .vbtn[aria-pressed="true"]{
+      border-color: rgba(39,224,255,.55) !important;
+      background: rgba(39,224,255,.10) !important;
+      color: rgba(231,240,255,.92) !important;
+    }
+    .vbtn[disabled]{
+      opacity:.45; cursor:not-allowed;
+    }
+
+    .notes{
+      margin-top:12px; padding:12px 12px; border-radius:14px;
+      background:linear-gradient(180deg, rgba(12,18,26,.70), rgba(12,18,26,.35));
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .notesHead{font-size:12px; color:rgba(231,240,255,.82); font-weight:900; letter-spacing:.2px; margin-bottom:6px}
+    .notesBody{font-size:13px; line-height:1.45; color:rgba(231,240,255,.90)}
+    .tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+    .tag{
+      font-size:11px; padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+      color:rgba(231,240,255,.76);
+    }
+
+    .list{padding:10px 10px 12px; display:grid; gap:8px}
+    .row{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      padding:10px 10px; border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .row:hover{transform:translateY(-1px); border-color:rgba(39,224,255,.25); background:rgba(255,255,255,.06)}
+    .row.active{border-color:rgba(39,224,255,.45); background:rgba(39,224,255,.08)}
+    .rowLeft{display:flex; gap:10px; align-items:center; min-width:0}
+    .chip{
+      font-family:var(--mono); font-size:11px; padding:4px 8px; border-radius:999px;
+      background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); color:rgba(231,240,255,.72);
+    }
+    .rowTitle{font-weight:900; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+    .rowMeta{font-size:11px; color:var(--muted); margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70ch}
+    .rowRight{display:flex; gap:10px; align-items:center; color:var(--muted); font-size:12px}
+
+    .foot{
+      padding:10px 14px 14px;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      border-top:1px solid rgba(255,255,255,.06)
+    }
+
+    .booklet{padding:12px 14px 16px; color:rgba(231,240,255,.90)}
+    .booklet h2{margin:6px 0 2px; font-size:15px}
+    .booklet h3{margin:12px 0 6px; font-size:13px; letter-spacing:.2px}
+    .booklet p, .booklet li{font-size:13px; line-height:1.5; color:rgba(231,240,255,.85)}
+    .booklet ul{margin:6px 0 0 18px}
+    .quote{
+      border-radius:14px; padding:12px 12px;
+      background:linear-gradient(180deg, rgba(12,18,26,.75), rgba(12,18,26,.35));
+      border:1px solid rgba(255,255,255,.10);
+      margin:10px 0 12px;
+    }
+    .quoteK{font-size:11px; color:rgba(231,240,255,.75); letter-spacing:.25px; text-transform:uppercase}
+    .quoteT{font-size:14px; font-weight:900; margin-top:6px}
+    .bTrack{
+      padding:10px 10px; border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      margin-top:8px;
+      cursor:pointer;
+    }
+    .bTrack:hover{border-color:rgba(39,224,255,.25)}
+    .bTrack.active{border-color:rgba(39,224,255,.45); background:rgba(39,224,255,.08)}
+    .bTrack b{display:block; font-size:13px}
+    .bTrack p{margin:6px 0 0; color:rgba(231,240,255,.80)}
+
+    .callout{
+      margin-top:12px;
+      padding:10px 10px;
+      border-radius:14px;
+      border:1px dashed rgba(255,255,255,.18);
+      background:rgba(255,255,255,.03);
+      color:rgba(231,240,255,.80);
+      font-size:12px;
+      line-height:1.45;
+    }
+
+    @media print{
+      .btn, .badges, .foot, .mini {display:none !important}
+      .card{box-shadow:none !important}
+      body{background:#fff !important; color:#000 !important}
+      .booklet, .booklet p, .booklet li, .quoteT, .trackName{color:#000 !important}
+      .small, .sub {color:#333 !important}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="sigil" aria-hidden="true"></div>
+      <div>
+        <h1>EchoStory — <span>“COHERENCE BY DEFAULT”</span></h1>
+        <div class="sub">A booklet + playlist player for your EchoStory tracks. Includes a toggle for Standard vs (1) versions.</div>
+        <div class="badges">
+          <span class="badge">Playlist Player</span>
+          <span class="badge">Booklet Mode</span>
+          <span class="badge" id="saveBadge">Autosave: On</span>
+          <span class="badge mono" id="versionBadge">Version: Standard</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- PLAYER -->
+      <section class="card" aria-label="EchoStory playlist player">
+        <div class="head">
+          <div>
+            <div class="title">Now Playing</div>
+            <div class="hint">Tap a track. Player remembers last track + position + chosen version.</div>
+          </div>
+          <div class="mini">
+            <button class="btn ghost" id="btnCopy">Copy Tracklist</button>
+            <button class="btn ghost" id="btnPrint">Print</button>
+          </div>
+        </div>
+
+        <div class="body">
+          <div class="nowLine1">
+            <span class="letter" id="nowLetter">A</span>
+            <span class="trackName" id="nowTitle">Inevitable Spine</span>
+          </div>
+
+          <div class="nowLine2">
+            <span class="small mono" id="nowFile">inevitable_spine.mp3</span>
+            <span class="dot">•</span>
+            <span class="small" id="nowTime">0:00 / 0:00</span>
+          </div>
+
+          <div class="progress">
+            <input id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek" />
+            <div class="progressMeta">
+              <span class="small" id="cur">0:00</span>
+              <span class="small" id="dur">0:00</span>
+            </div>
+          </div>
+
+          <div class="controls">
+            <div class="controlsLeft">
+              <button class="btn" id="prev" aria-label="Previous">⏮</button>
+              <button class="btn primary" id="play" aria-label="Play/Pause">▶</button>
+              <button class="btn" id="next" aria-label="Next">⏭</button>
+              <button class="btn ghost" id="loop" aria-label="Loop">Loop: Off</button>
+            </div>
+
+            <div class="controlsRight">
+              <div class="version">
+                <span class="small">Version</span>
+                <button class="btn ghost vbtn" id="vStd" aria-pressed="true">Standard</button>
+                <button class="btn ghost vbtn" id="vAlt" aria-pressed="false">(1)</button>
+              </div>
+
+              <div class="vol">
+                <span class="small">Vol</span>
+                <input id="vol" type="range" min="0" max="1" value="0.9" step="0.01" aria-label="Volume" />
+              </div>
+            </div>
+          </div>
+
+          <div class="notes">
+            <div class="notesHead">Liner Notes</div>
+            <div class="notesBody" id="notesBody">
+              The moment the builder becomes the architect. No more flare-gun wins—just durable outcomes.
+            </div>
+            <div class="tags" id="tags"></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="list" id="list" aria-label="Playlist"></div>
+
+          <audio id="audio" preload="metadata"></audio>
+
+          <div class="foot">
+            <div class="small">
+              Shortcuts: <b>Space</b>=Play/Pause • <b>N/P</b>=Next/Prev • <b>←/→</b>=Seek 5s • <b>L</b>=Loop • <b>V</b>=Toggle version
+            </div>
+            <div class="small" id="lastSaved">Last saved: —</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOOKLET -->
+      <aside class="card" aria-label="Album booklet">
+        <div class="head">
+          <div>
+            <div class="title">Album Booklet</div>
+            <div class="hint">A one-sheet insert for the EchoStory arc you’ve captured.</div>
+          </div>
+        </div>
+
+        <div class="booklet">
+          <h2>EchoStory Album Booklet — “COHERENCE BY DEFAULT”</h2>
+
+          <h3>Album concept</h3>
+          <p>
+            This isn’t a year recap — it’s a systems log turned into music. The arc moves from sparks → spine:
+            from proving you can build to building like the outcome is inevitable.
+            The sound stays unmistakably Swamp-Hop: halftime pressure, engineered minimalism, warm truth,
+            and a tiny bit of neon circuitry.
+          </p>
+
+          <div class="quote">
+            <div class="quoteK">Core mantra</div>
+            <div class="quoteT">“I build environments where good outcomes become the default.”</div>
+          </div>
+
+          <h3>Tracklist + liner notes</h3>
+
+          <div class="bTrack" data-track="0">
+            <b>A) Inevitable Spine</b>
+            <p>The moment the builder becomes the architect. No more flare-gun wins—just durable outcomes.</p>
+          </div>
+
+          <div class="bTrack" data-track="1">
+            <b>B) Year in Signals</b>
+            <p>A readable signal inside the static: integration over accumulation, clarity over volume, finishing over novelty.</p>
+          </div>
+
+          <div class="bTrack" data-track="2">
+            <b>C) Quarter Reel (Stabilize → Converge)</b>
+            <p>Four-part montage: Q1 noise-cut, Q2 structural integrity, Q3 identity compression, Q4 convergence.</p>
+          </div>
+
+          <div class="bTrack" data-track="3">
+            <b>D) Guardrails (Double Down / Drop)</b>
+            <p>Governance in chant form. If it doesn’t connect or strengthen the system, it’s optional.</p>
+          </div>
+
+          <div class="bTrack" data-track="4">
+            <b>I) Cadence / Seal (Future-Me Contract)</b>
+            <p>The maintenance ritual: daily filter, weekly loop closure, monthly audit. The promise the system stays alive.</p>
+          </div>
+
+          <h3>Credits (in-world)</h3>
+          <ul>
+            <li><b>Founder Voice:</b> Timbr (wise grit)</li>
+            <li><b>Signal / Tech Prophet:</b> Byte</li>
+            <li><b>Spine:</b> NXCore</li>
+            <li><b>Cockpit:</b> AeroCoreOS</li>
+            <li><b>Heartbeat:</b> EchoVerse</li>
+          </ul>
+
+          <h3>How to listen</h3>
+          <p>
+            First run: A → I in order. After that:
+            discipline = D → C → I • meaning = A → I • systems = B → C → D.
+          </p>
+
+          <div class="callout">
+            <b>Note:</b> Your folder currently includes A, B, C, D, and I.
+            When you add the missing tracks (E/F/G/H), we can extend the playlist to the full A–I arc
+            and keep the same Standard/(1) toggle behavior.
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      // ---------------------------
+      // Files are in the same folder as this index.html
+      // If you move them into ./audio/, change basePath to "./audio/"
+      // ---------------------------
+      const basePath = "./";
+
+      // Playlist in correct order for the files you have:
+      // A, B, C, D, I
+      // Filename pattern verified from your screenshot:
+      // - Standard: name.mp3
+      // - Alt:      name_(1).mp3
+      // Quarter Reel does NOT show a (1) file in the screenshot — handled gracefully.
+      const playlist = [
+        {
+          letter: "A",
+          title: "Inevitable Spine",
+          fileStd: "inevitable_spine.mp3",
+          fileAlt: "inevitable_spine_(1).mp3",
+          notes: "The moment the builder becomes the architect. No more flare-gun wins—just durable outcomes.",
+          tags: ["spine","thesis","durability","coherence"]
+        },
+        {
+          letter: "B",
+          title: "Year in Signals",
+          fileStd: "year_in_signals.mp3",
+          fileAlt: "year_in_signals_(1).mp3",
+          notes: "A readable signal inside the static: integration over accumulation, clarity over volume, finishing over novelty.",
+          tags: ["signals","integration","clarity","finish"]
+        },
+        {
+          letter: "C",
+          title: "Quarter Reel (Stabilize → Converge)",
+          fileStd: "quarter_reel_(stabilize_to_converge).mp3",
+          fileAlt: null, // no (1) file shown in screenshot
+          notes: "Four-part montage: Q1 noise-cut, Q2 structural integrity, Q3 identity compression, Q4 convergence.",
+          tags: ["quarters","arc","structure","converge"]
+        },
+        {
+          letter: "D",
+          title: "Guardrails (Double Down / Drop)",
+          fileStd: "guardrails_(double_down_drop).mp3",
+          fileAlt: "guardrails_(double_down_drop)_(1).mp3",
+          notes: "Governance in chant form. If it doesn’t connect or strengthen the system, it’s optional.",
+          tags: ["guardrails","discipline","drop","keep"]
+        },
+        {
+          letter: "I",
+          title: "Cadence / Seal (Future-Me Contract)",
+          fileStd: "cadence_seal_(future-me_contract).mp3",
+          fileAlt: "cadence_seal_(future-me_contract)_(1).mp3",
+          notes: "The maintenance ritual: daily filter, weekly loop closure, monthly audit. The promise the system stays alive.",
+          tags: ["cadence","seal","maintenance","future-me"]
+        }
+      ];
+
+      // ---------------------------
+      // State
+      // ---------------------------
+      const LS_KEY = "ev_coherence_player_index_v1";
+
+      const audio = document.getElementById("audio");
+      const el = {
+        list: document.getElementById("list"),
+        nowLetter: document.getElementById("nowLetter"),
+        nowTitle: document.getElementById("nowTitle"),
+        nowFile: document.getElementById("nowFile"),
+        nowTime: document.getElementById("nowTime"),
+        cur: document.getElementById("cur"),
+        dur: document.getElementById("dur"),
+        seek: document.getElementById("seek"),
+        vol: document.getElementById("vol"),
+        play: document.getElementById("play"),
+        prev: document.getElementById("prev"),
+        next: document.getElementById("next"),
+        loop: document.getElementById("loop"),
+        notesBody: document.getElementById("notesBody"),
+        tags: document.getElementById("tags"),
+        lastSaved: document.getElementById("lastSaved"),
+        saveBadge: document.getElementById("saveBadge"),
+        versionBadge: document.getElementById("versionBadge"),
+        vStd: document.getElementById("vStd"),
+        vAlt: document.getElementById("vAlt"),
+        btnCopy: document.getElementById("btnCopy"),
+        btnPrint: document.getElementById("btnPrint"),
+        bookletTracks: Array.from(document.querySelectorAll(".bTrack"))
+      };
+
+      function fmt(sec){
+        if(!isFinite(sec)) return "0:00";
+        sec = Math.max(0, Math.floor(sec));
+        const m = Math.floor(sec/60);
+        const s = (sec%60).toString().padStart(2,"0");
+        return `${m}:${s}`;
+      }
+
+      function loadState(){
+        try{
+          const raw = localStorage.getItem(LS_KEY);
+          if(!raw) return { idx:0, t:0, vol:0.9, loop:false, version:"std" };
+          const st = JSON.parse(raw);
+          return {
+            idx: Number.isInteger(st.idx) ? Math.max(0, Math.min(playlist.length-1, st.idx)) : 0,
+            t: typeof st.t === "number" ? Math.max(0, st.t) : 0,
+            vol: typeof st.vol === "number" ? Math.max(0, Math.min(1, st.vol)) : 0.9,
+            loop: !!st.loop,
+            version: (st.version === "alt") ? "alt" : "std"
+          };
+        }catch(e){
+          return { idx:0, t:0, vol:0.9, loop:false, version:"std" };
+        }
+      }
+
+      function saveState(st){
+        const payload = {
+          idx: st.idx,
+          t: st.t,
+          vol: st.vol,
+          loop: st.loop,
+          version: st.version,
+          savedAt: new Date().toISOString()
+        };
+        localStorage.setItem(LS_KEY, JSON.stringify(payload));
+        el.lastSaved.textContent = "Last saved: " + new Date(payload.savedAt).toLocaleString();
+        el.saveBadge.textContent = "Autosave: On";
+      }
+
+      let state = loadState();
+
+      function trackFile(track){
+        const wantAlt = (state.version === "alt");
+        const pick = wantAlt ? (track.fileAlt || track.fileStd) : track.fileStd;
+        return pick || track.fileStd;
+      }
+
+      function setVersionUI(){
+        const isStd = state.version === "std";
+        el.vStd.setAttribute("aria-pressed", isStd ? "true" : "false");
+        el.vAlt.setAttribute("aria-pressed", !isStd ? "true" : "false");
+        el.versionBadge.textContent = "Version: " + (isStd ? "Standard" : "(1)");
+
+        const t = playlist[state.idx];
+        const altExists = !!t.fileAlt;
+        el.vAlt.disabled = !altExists;
+        el.vAlt.title = altExists ? "Switch to (1)" : "No (1) file for this track";
+      }
+
+      function setLoop(on){
+        state.loop = !!on;
+        audio.loop = state.loop;
+        el.loop.textContent = "Loop: " + (state.loop ? "On" : "Off");
+        saveState({ ...state, t: audio.currentTime || state.t, vol: audio.volume, loop: state.loop, version: state.version });
+      }
+
+      function setPlayBtn(){
+        el.play.textContent = audio.paused ? "▶" : "⏸";
+      }
+
+      function setSrc(){
+        const t = playlist[state.idx];
+        const file = trackFile(t);
+        audio.src = basePath + file;
+        el.nowFile.textContent = file;
+      }
+
+      function renderNow(){
+        const t = playlist[state.idx];
+        el.nowLetter.textContent = t.letter;
+        el.nowTitle.textContent = t.title;
+
+        el.notesBody.textContent = t.notes;
+        el.tags.innerHTML = "";
+        t.tags.forEach(tag=>{
+          const s = document.createElement("span");
+          s.className = "tag";
+          s.textContent = tag;
+          el.tags.appendChild(s);
+        });
+
+        // highlight booklet
+        el.bookletTracks.forEach((node, i)=>{
+          node.classList.toggle("active", i === state.idx);
+        });
+      }
+
+      function renderList(){
+        el.list.innerHTML = "";
+        playlist.forEach((t, i)=>{
+          const row = document.createElement("div");
+          row.className = "row" + (i === state.idx ? " active" : "");
+          row.tabIndex = 0;
+
+          const meta = t.fileAlt
+            ? `${t.fileStd}  •  (1) ${t.fileAlt}`
+            : `${t.fileStd}  •  (1) —`;
+
+          row.innerHTML = `
+            <div class="rowLeft">
+              <span class="chip">${t.letter}</span>
+              <div style="min-width:0">
+                <div class="rowTitle">${t.title}</div>
+                <div class="rowMeta">${meta}</div>
+              </div>
+            </div>
+            <div class="rowRight">
+              <span class="small">Tap</span>
+            </div>
+          `;
+
+          row.addEventListener("click", ()=> selectTrack(i, true));
+          row.addEventListener("keydown", (e)=>{
+            if(e.key === "Enter" || e.key === " "){
+              e.preventDefault();
+              selectTrack(i, true);
+            }
+          });
+          el.list.appendChild(row);
+        });
+      }
+
+      function selectTrack(idx, autoplay){
+        state.idx = idx;
+        state.t = 0;
+        setSrc();
+        renderNow();
+        renderList();
+        setVersionUI();
+        saveState({ ...state, t: 0, vol: audio.volume, loop: state.loop, version: state.version });
+
+        if(autoplay){
+          audio.play().catch(()=>{});
+        }
+        setPlayBtn();
+      }
+
+      async function switchVersion(to){
+        const t = playlist[state.idx];
+        if(to === "alt" && !t.fileAlt) return;
+
+        const wasPlaying = !audio.paused;
+        const pos = audio.currentTime || 0;
+
+        state.version = (to === "alt") ? "alt" : "std";
+        setVersionUI();
+        setSrc();
+        saveState({ ...state, t: pos, vol: audio.volume, loop: state.loop, version: state.version });
+
+        const onMeta = async ()=>{
+          audio.removeEventListener("loadedmetadata", onMeta);
+          if(isFinite(audio.duration) && pos < audio.duration - 0.25) audio.currentTime = pos;
+          if(wasPlaying) { try{ await audio.play(); }catch(e){} }
+          setPlayBtn();
+        };
+        audio.addEventListener("loadedmetadata", onMeta);
+      }
+
+      // ---------------------------
+      // Progress + seek
+      // ---------------------------
+      let seeking = false;
+
+      audio.addEventListener("loadedmetadata", ()=>{
+        el.dur.textContent = fmt(audio.duration);
+        el.seek.value = "0";
+        setPlayBtn();
+      });
+
+      audio.addEventListener("timeupdate", ()=>{
+        const dur = audio.duration || 0;
+        const cur = audio.currentTime || 0;
+
+        if(!seeking){
+          const v = dur ? Math.round((cur/dur)*1000) : 0;
+          el.seek.value = String(v);
+        }
+
+        el.cur.textContent = fmt(cur);
+        el.dur.textContent = fmt(dur);
+        el.nowTime.textContent = `${fmt(cur)} / ${fmt(dur)}`;
+
+        // autosave every ~2.5s
+        if(cur > 0){
+          if(!window.__evSaveTick || Date.now() - window.__evSaveTick > 2500){
+            window.__evSaveTick = Date.now();
+            saveState({ ...state, t: cur, vol: audio.volume, loop: state.loop, version: state.version });
+          }
+        }
+      });
+
+      audio.addEventListener("ended", ()=>{
+        if(!state.loop){
+          const i = (state.idx + 1) % playlist.length;
+          selectTrack(i, true);
+        }
+      });
+
+      el.seek.addEventListener("input", ()=> seeking = true);
+      el.seek.addEventListener("change", ()=>{
+        const dur = audio.duration || 0;
+        const v = Number(el.seek.value) / 1000;
+        const target = dur * v;
+        audio.currentTime = isFinite(target) ? target : 0;
+        seeking = false;
+        saveState({ ...state, t: audio.currentTime || 0, vol: audio.volume, loop: state.loop, version: state.version });
+      });
+
+      // ---------------------------
+      // Controls
+      // ---------------------------
+      function prev(autoplay){
+        const i = (state.idx - 1 + playlist.length) % playlist.length;
+        selectTrack(i, autoplay);
+      }
+      function next(autoplay){
+        const i = (state.idx + 1) % playlist.length;
+        selectTrack(i, autoplay);
+      }
+
+      el.play.addEventListener("click", ()=>{
+        if(audio.paused) audio.play().catch(()=>{});
+        else audio.pause();
+        setPlayBtn();
+      });
+      el.prev.addEventListener("click", ()=> prev(true));
+      el.next.addEventListener("click", ()=> next(true));
+      el.loop.addEventListener("click", ()=> setLoop(!state.loop));
+
+      el.vol.addEventListener("input", ()=>{
+        audio.volume = Number(el.vol.value);
+        saveState({ ...state, t: audio.currentTime || 0, vol: audio.volume, loop: state.loop, version: state.version });
+      });
+
+      el.vStd.addEventListener("click", ()=> switchVersion("std"));
+      el.vAlt.addEventListener("click", ()=> switchVersion("alt"));
+
+      el.bookletTracks.forEach(node=>{
+        node.addEventListener("click", ()=>{
+          const idx = Number(node.getAttribute("data-track"));
+          if(Number.isFinite(idx)) selectTrack(idx, true);
+        });
+      });
+
+      el.btnPrint.addEventListener("click", ()=> window.print());
+
+      el.btnCopy.addEventListener("click", async ()=>{
+        const lines = playlist.map(t => {
+          const alt = t.fileAlt ? t.fileAlt : "—";
+          return `${t.letter}) ${t.title}\n   std: ${t.fileStd}\n   (1):  ${alt}`;
+        });
+        const txt = `EchoStory — COHERENCE BY DEFAULT\n\n` + lines.join("\n\n");
+        try{
+          await navigator.clipboard.writeText(txt);
+          el.btnCopy.textContent = "Copied";
+          setTimeout(()=> el.btnCopy.textContent = "Copy Tracklist", 900);
+        }catch(e){
+          alert(txt);
+        }
+      });
+
+      // Keyboard shortcuts
+      window.addEventListener("keydown", (e)=>{
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+        if(tag === "input" || tag === "textarea") return;
+
+        if(e.key === " "){ e.preventDefault(); el.play.click(); }
+        if(e.key === "n" || e.key === "N"){ next(true); }
+        if(e.key === "p" || e.key === "P"){ prev(true); }
+        if(e.key === "l" || e.key === "L"){ setLoop(!state.loop); }
+        if(e.key === "v" || e.key === "V"){
+          const t = playlist[state.idx];
+          if(!t.fileAlt) return;
+          switchVersion(state.version === "std" ? "alt" : "std");
+        }
+        if(e.key === "ArrowRight"){ audio.currentTime = Math.min((audio.currentTime||0)+5, audio.duration||1e9); }
+        if(e.key === "ArrowLeft"){ audio.currentTime = Math.max((audio.currentTime||0)-5, 0); }
+      });
+
+      // ---------------------------
+      // INIT
+      // ---------------------------
+      audio.volume = state.vol;
+      el.vol.value = String(state.vol);
+      setLoop(state.loop);
+      setVersionUI();
+
+      renderList();
+      setSrc();
+      renderNow();
+
+      // Restore last position when we can
+      audio.addEventListener("canplay", ()=>{
+        if(window.__evRestored) return;
+        window.__evRestored = true;
+
+        if(state.t > 0 && isFinite(audio.duration) && state.t < audio.duration - 0.25){
+          audio.currentTime = state.t;
+        }
+        setPlayBtn();
+      });
+
+      // show last saved stamp if exists
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          if(parsed.savedAt){
+            el.lastSaved.textContent = "Last saved: " + new Date(parsed.savedAt).toLocaleString();
+          }
+        }
+      }catch(e){}
+    })();
+  </script>
+</body>
+</html>
