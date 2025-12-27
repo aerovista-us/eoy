@@ -3,7 +3,7 @@
    - Runtime cache for audio + assets
    - On-demand "Offline Pack" caching via postMessage
 */
-const VERSION = "coherence-v1";
+const VERSION = "coherence-v2";
 const CORE_CACHE = `${VERSION}-core`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 
@@ -44,7 +44,10 @@ async function cacheFirst(request) {
   if (cached) return cached;
 
   const resp = await fetch(request);
-  if (resp && resp.ok) cache.put(request, resp.clone());
+  // Only cache successful responses (exclude 206 Partial Content and other unsupported status codes)
+  if (resp && resp.ok && resp.status !== 206) {
+    cache.put(request, resp.clone());
+  }
   return resp;
 }
 
@@ -52,7 +55,10 @@ async function networkFirst(request) {
   const cache = await caches.open(RUNTIME_CACHE);
   try {
     const resp = await fetch(request);
-    if (resp && resp.ok) cache.put(request, resp.clone());
+    // Only cache successful responses (exclude 206 Partial Content and other unsupported status codes)
+    if (resp && resp.ok && resp.status !== 206) {
+      cache.put(request, resp.clone());
+    }
     return resp;
   } catch (e) {
     const cached = await cache.match(request);
@@ -88,7 +94,8 @@ async function cacheUrls(urls) {
     try {
       const req = new Request(u, { cache: "reload" });
       const resp = await fetch(req);
-      if (resp && resp.ok) {
+      // Only cache successful responses (exclude 206 Partial Content and other unsupported status codes)
+      if (resp && resp.ok && resp.status !== 206) {
         await cache.put(req, resp.clone());
         results.ok++;
       } else {
