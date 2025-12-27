@@ -23,55 +23,36 @@
     if (btn) btn.style.display = "";
     log("beforeinstallprompt captured");
 
-    // Show install prompt after user interaction
-    showInstallPrompt();
+    // Show a subtle notification that install is available (only once)
+    setTimeout(() => {
+      if (!installNotified && !installPromptShown) {
+        installNotified = true;
+        toast("📱 Install available! Click 'Install App' for offline access.", "info");
+      }
+    }, 2000);
   });
 
-  async function showInstallPrompt(){
-    if (installPromptShown || !deferredPrompt) return;
-
-    // Wait a bit for user to get oriented, then show prompt
-    setTimeout(async () => {
-      if (installPromptShown || !deferredPrompt) return;
-
-      installPromptShown = true;
-
-      // Show a toast asking if they want to install
-      const shouldInstall = confirm("📱 Install EchoStory as an app?\n\n• Works offline\n• Faster loading\n• App-like experience\n\nInstall now?");
-
-      if (shouldInstall) {
-        try {
-          deferredPrompt.prompt();
-          const choice = await deferredPrompt.userChoice;
-          toast(choice.outcome === "accepted" ? "🎉 Installed successfully!" : "Install cancelled", "info");
-        } catch (e) {
-          toast("Install failed", "warn");
-        }
-      } else {
-        toast("You can install later from the menu → Install App", "info");
-      }
-
-      deferredPrompt = null;
-      const btn = document.getElementById("ev-btn-install");
-      if (btn) btn.style.display = "none";
-    }, 3000); // Show after 3 seconds of interaction
-  }
-
   async function doInstall(){
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      toast("Install not available right now. Try refreshing the page.", "warn");
+      return;
+    }
+
     installPromptShown = true;
 
     try {
       deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
       toast(choice.outcome === "accepted" ? "🎉 Installed successfully!" : "Install cancelled", "info");
-    } catch (e) {
-      toast("Install failed", "warn");
-    }
 
-    deferredPrompt = null;
-    const btn = document.getElementById("ev-btn-install");
-    if (btn) btn.style.display = "none";
+      // Hide the button after user makes a choice
+      deferredPrompt = null;
+      const btn = document.getElementById("ev-btn-install");
+      if (btn) btn.style.display = "none";
+    } catch (e) {
+      console.error("Install prompt failed:", e);
+      toast("Install prompt failed. Try again.", "warn");
+    }
   }
 
   async function registerSW(){
@@ -181,19 +162,8 @@
     if (offlineBtn) offlineBtn.addEventListener("click", offlinePack);
   }
 
-  // Track user engagement to show install prompt
-  let userEngaged = false;
-  function markEngaged(){
-    if (!userEngaged) {
-      userEngaged = true;
-      showInstallPrompt();
-    }
-  }
-
-  // Show install prompt on user interaction
-  document.addEventListener("click", markEngaged, { once: true });
-  document.addEventListener("keydown", markEngaged, { once: true });
-  document.addEventListener("touchstart", markEngaged, { once: true });
+  // Track if we've shown install messaging
+  let installNotified = false;
 
   window.addEventListener("load", () => {
     registerSW();
